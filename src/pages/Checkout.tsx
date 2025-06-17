@@ -7,12 +7,14 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Check, CreditCard, User, Heart } from 'lucide-react';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { ArrowLeft, Check, CreditCard, User, Heart, Calendar } from 'lucide-react';
 
 const Checkout = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const planType = searchParams.get('plan') || 'huellito';
+  const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly');
   
   const [customerInfo, setCustomerInfo] = useState({
     name: '',
@@ -28,6 +30,7 @@ const Checkout = () => {
       name: 'Plan Huellito',
       price: 0,
       period: 'por mes',
+      annualPrice: 0,
       color: 'bg-slate-50',
       features: [
         '10 consultas en WaggiBot',
@@ -71,15 +74,30 @@ const Checkout = () => {
 
   const selectedPlan = plans[planType as keyof typeof plans];
 
+  const getCurrentPrice = () => {
+    if (selectedPlan.price === 0) return 0;
+    return billingCycle === 'monthly' ? selectedPlan.price : selectedPlan.annualPrice;
+  };
+
+  const getAnnualDiscount = () => {
+    if (selectedPlan.price === 0) return 0;
+    const monthlyYearly = selectedPlan.price * 12;
+    const annualPrice = selectedPlan.annualPrice;
+    return monthlyYearly - annualPrice;
+  };
+
   const handleInputChange = (field: string, value: string) => {
     setCustomerInfo(prev => ({ ...prev, [field]: value }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Aquí iría la lógica de procesamiento del pago
-    console.log('Procesando compra:', { plan: selectedPlan, customer: customerInfo });
-    // Simular éxito y redirigir
+    console.log('Procesando compra:', { 
+      plan: selectedPlan, 
+      billingCycle, 
+      finalPrice: getCurrentPrice(),
+      customer: customerInfo 
+    });
     alert('¡Compra exitosa! Bienvenido a Waggi');
     navigate('/');
   };
@@ -123,16 +141,50 @@ const Checkout = () => {
                 <p className="text-gray-600">Pet Grooming Services</p>
               </CardHeader>
               <CardContent className="space-y-4">
+                {/* Billing Cycle Selection */}
+                {selectedPlan.price > 0 && (
+                  <div className="space-y-3">
+                    <Label className="text-sm font-semibold text-gray-900">Ciclo de facturación</Label>
+                    <RadioGroup value={billingCycle} onValueChange={(value) => setBillingCycle(value as 'monthly' | 'annual')}>
+                      <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-white/50 transition-colors">
+                        <RadioGroupItem value="monthly" id="monthly" />
+                        <Label htmlFor="monthly" className="flex-1 cursor-pointer">
+                          <div className="flex justify-between items-center">
+                            <span>Mensual</span>
+                            <span className="font-semibold">{formatPrice(selectedPlan.price)}</span>
+                          </div>
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-white/50 transition-colors">
+                        <RadioGroupItem value="annual" id="annual" />
+                        <Label htmlFor="annual" className="flex-1 cursor-pointer">
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <span>Anual</span>
+                                <Badge variant="secondary" className="text-xs bg-green-100 text-green-700">
+                                  Ahorra {formatPrice(getAnnualDiscount())}
+                                </Badge>
+                              </div>
+                              <div className="text-xs text-gray-500">
+                                {formatPrice(selectedPlan.annualPrice / 12)}/mes
+                              </div>
+                            </div>
+                            <span className="font-semibold">{formatPrice(selectedPlan.annualPrice)}</span>
+                          </div>
+                        </Label>
+                      </div>
+                    </RadioGroup>
+                  </div>
+                )}
+
                 <div className="text-center">
                   <div className="text-3xl font-bold text-teal-600">
-                    {selectedPlan.price === 0 ? 'Gratis' : formatPrice(selectedPlan.price)}
+                    {selectedPlan.price === 0 ? 'Gratis' : formatPrice(getCurrentPrice())}
                   </div>
-                  <div className="text-gray-600">{selectedPlan.period}</div>
-                  {selectedPlan.annualPrice && (
-                    <div className="text-sm text-gray-500 mt-1">
-                      {formatPrice(selectedPlan.annualPrice)} / plan anual
-                    </div>
-                  )}
+                  <div className="text-gray-600">
+                    {selectedPlan.price === 0 ? selectedPlan.period : (billingCycle === 'monthly' ? 'por mes' : 'por año')}
+                  </div>
                 </div>
                 
                 <Separator />
@@ -296,22 +348,30 @@ const Checkout = () => {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-700">{selectedPlan.name}</span>
+                    <span className="text-gray-700">
+                      {selectedPlan.name} ({billingCycle === 'monthly' ? 'Mensual' : 'Anual'})
+                    </span>
                     <span className="font-semibold">
-                      {selectedPlan.price === 0 ? 'Gratis' : formatPrice(selectedPlan.price)}
+                      {selectedPlan.price === 0 ? 'Gratis' : formatPrice(getCurrentPrice())}
                     </span>
                   </div>
+                  {billingCycle === 'annual' && selectedPlan.price > 0 && (
+                    <div className="flex justify-between items-center text-sm text-green-600">
+                      <span>Descuento anual</span>
+                      <span>-{formatPrice(getAnnualDiscount())}</span>
+                    </div>
+                  )}
                   {selectedPlan.price > 0 && (
                     <>
                       <div className="flex justify-between items-center text-sm text-gray-600">
                         <span>IVA (19%)</span>
-                        <span>{formatPrice(selectedPlan.price * 0.19)}</span>
+                        <span>{formatPrice(getCurrentPrice() * 0.19)}</span>
                       </div>
                       <Separator />
                       <div className="flex justify-between items-center text-lg font-bold">
                         <span>Total</span>
                         <span className="text-teal-600">
-                          {formatPrice(selectedPlan.price * 1.19)}
+                          {formatPrice(getCurrentPrice() * 1.19)}
                         </span>
                       </div>
                     </>
