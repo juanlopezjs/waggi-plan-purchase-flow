@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { Badge } from '@/components/ui/badge';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { ArrowLeft, Check, CreditCard, User, Heart, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import CheckoutHeader from '@/components/checkout/CheckoutHeader';
+import PlanSummary from '@/components/checkout/PlanSummary';
+import CustomerForm from '@/components/checkout/CustomerForm';
+import PetForm from '@/components/checkout/PetForm';
+import PaymentForm from '@/components/checkout/PaymentForm';
+import OrderSummary from '@/components/checkout/OrderSummary';
 
 const Checkout = () => {
   const [searchParams] = useSearchParams();
@@ -173,292 +173,50 @@ const Checkout = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-teal-50 to-amber-50">
       <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="flex items-center gap-4 mb-8">
-          <Button 
-            variant="ghost" 
-            onClick={() => navigate('/')}
-            className="flex items-center gap-2 text-teal-700 hover:bg-teal-100"
-            disabled={isProcessing}
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Volver a planes
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Confirma tu plan</h1>
-            <p className="text-gray-600">Estás a un paso de cuidar mejor a tu mascota</p>
-          </div>
-        </div>
+        <CheckoutHeader 
+          onBack={() => navigate('/')} 
+          isProcessing={isProcessing} 
+        />
 
         <div className="grid lg:grid-cols-3 gap-8">
-          {/* Plan Summary */}
           <div className="lg:col-span-1">
-            <Card className={`${selectedPlan.color} border-teal-200`}>
-              <CardHeader className="text-center">
-                <div className="mx-auto w-16 h-16 bg-teal-600 rounded-full flex items-center justify-center mb-4">
-                  <Heart className="w-8 h-8 text-white" />
-                </div>
-                <CardTitle className="text-2xl text-gray-900">{selectedPlan.name}</CardTitle>
-                <p className="text-gray-600">Pet Grooming Services</p>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {/* Billing Cycle Selection */}
-                {selectedPlan.price > 0 && (
-                  <div className="space-y-3">
-                    <Label className="text-sm font-semibold text-gray-900">Ciclo de facturación</Label>
-                    <RadioGroup value={billingCycle} onValueChange={(value) => setBillingCycle(value as 'monthly' | 'annual')}>
-                      <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-white/50 transition-colors">
-                        <RadioGroupItem value="monthly" id="monthly" />
-                        <Label htmlFor="monthly" className="flex-1 cursor-pointer">
-                          <div className="flex justify-between items-center">
-                            <span>Mensual</span>
-                            <span className="font-semibold">{formatPrice(selectedPlan.price)}</span>
-                          </div>
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-white/50 transition-colors">
-                        <RadioGroupItem value="annual" id="annual" />
-                        <Label htmlFor="annual" className="flex-1 cursor-pointer">
-                          <div className="flex justify-between items-center">
-                            <div>
-                              <div className="flex items-center gap-2">
-                                <span>Anual</span>
-                                <Badge variant="secondary" className="text-xs bg-green-100 text-green-700">
-                                  Ahorra {formatPrice(getAnnualDiscount())}
-                                </Badge>
-                              </div>
-                              <div className="text-xs text-gray-500">
-                                {formatPrice(selectedPlan.annualPrice / 12)}/mes
-                              </div>
-                            </div>
-                            <span className="font-semibold">{formatPrice(selectedPlan.annualPrice)}</span>
-                          </div>
-                        </Label>
-                      </div>
-                    </RadioGroup>
-                  </div>
-                )}
-
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-teal-600">
-                    {selectedPlan.price === 0 ? 'Gratis' : formatPrice(getCurrentPrice())}
-                  </div>
-                  <div className="text-gray-600">
-                    {selectedPlan.price === 0 ? selectedPlan.period : (billingCycle === 'monthly' ? 'por mes' : 'por año')}
-                  </div>
-                </div>
-                
-                <Separator />
-                
-                <div className="space-y-3">
-                  <h4 className="font-semibold text-gray-900">Incluye:</h4>
-                  {selectedPlan.features.map((feature, index) => (
-                    <div key={index} className="flex items-start gap-2">
-                      <Check className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
-                      <span className="text-sm text-gray-700">{feature}</span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+            <PlanSummary
+              selectedPlan={selectedPlan}
+              billingCycle={billingCycle}
+              onBillingCycleChange={(value) => setBillingCycle(value as 'monthly' | 'annual')}
+              formatPrice={formatPrice}
+            />
           </div>
 
-          {/* Checkout Form */}
           <div className="lg:col-span-2">
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Customer Information */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <User className="w-5 h-5 text-teal-600" />
-                    Información personal
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="grid md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Nombre completo *</Label>
-                    <Input
-                      id="name"
-                      value={customerInfo.name}
-                      onChange={(e) => handleInputChange('name', e.target.value)}
-                      placeholder="Tu nombre completo"
-                      required
-                      disabled={isProcessing}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Correo electrónico *</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={customerInfo.email}
-                      onChange={(e) => handleInputChange('email', e.target.value)}
-                      placeholder="tu@email.com"
-                      required
-                      disabled={isProcessing}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">Teléfono *</Label>
-                    <Input
-                      id="phone"
-                      value={customerInfo.phone}
-                      onChange={(e) => handleInputChange('phone', e.target.value)}
-                      placeholder="+57 300 123 4567"
-                      required
-                      disabled={isProcessing}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="address">Dirección</Label>
-                    <Input
-                      id="address"
-                      value={customerInfo.address}
-                      onChange={(e) => handleInputChange('address', e.target.value)}
-                      placeholder="Tu dirección"
-                      disabled={isProcessing}
-                    />
-                  </div>
-                </CardContent>
-              </Card>
+              <CustomerForm
+                customerInfo={customerInfo}
+                onInputChange={handleInputChange}
+                isProcessing={isProcessing}
+              />
 
-              {/* Pet Information */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Heart className="w-5 h-5 text-teal-600" />
-                    Información de tu mascota
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="grid md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="petName">Nombre de tu mascota *</Label>
-                    <Input
-                      id="petName"
-                      value={customerInfo.petName}
-                      onChange={(e) => handleInputChange('petName', e.target.value)}
-                      placeholder="Nombre de tu mascota"
-                      required
-                      disabled={isProcessing}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="petBreed">Raza</Label>
-                    <Input
-                      id="petBreed"
-                      value={customerInfo.petBreed}
-                      onChange={(e) => handleInputChange('petBreed', e.target.value)}
-                      placeholder="Raza de tu mascota"
-                      disabled={isProcessing}
-                    />
-                  </div>
-                </CardContent>
-              </Card>
+              <PetForm
+                petInfo={{ petName: customerInfo.petName, petBreed: customerInfo.petBreed }}
+                onInputChange={handleInputChange}
+                isProcessing={isProcessing}
+              />
 
-              {/* Payment Information */}
-              {selectedPlan.price > 0 && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <CreditCard className="w-5 h-5 text-teal-600" />
-                      Información de pago
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="bg-teal-50 border border-teal-200 rounded-lg p-4">
-                      <p className="text-teal-800 text-sm">
-                        🔒 Pago seguro procesado por Stripe. Tus datos están protegidos.
-                      </p>
-                    </div>
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="cardNumber">Número de tarjeta *</Label>
-                        <Input
-                          id="cardNumber"
-                          value={paymentInfo.cardNumber}
-                          onChange={(e) => handlePaymentChange('cardNumber', e.target.value)}
-                          placeholder="1234 5678 9012 3456"
-                          required
-                          disabled={isProcessing}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="cardName">Nombre en la tarjeta *</Label>
-                        <Input
-                          id="cardName"
-                          value={paymentInfo.cardName}
-                          onChange={(e) => handlePaymentChange('cardName', e.target.value)}
-                          placeholder="Como aparece en tu tarjeta"
-                          required
-                          disabled={isProcessing}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="expiry">Fecha de vencimiento *</Label>
-                        <Input
-                          id="expiry"
-                          value={paymentInfo.expiry}
-                          onChange={(e) => handlePaymentChange('expiry', e.target.value)}
-                          placeholder="MM/AA"
-                          required
-                          disabled={isProcessing}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="cvv">CVV *</Label>
-                        <Input
-                          id="cvv"
-                          value={paymentInfo.cvv}
-                          onChange={(e) => handlePaymentChange('cvv', e.target.value)}
-                          placeholder="123"
-                          required
-                          disabled={isProcessing}
-                        />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
+              <PaymentForm
+                paymentInfo={paymentInfo}
+                onPaymentChange={handlePaymentChange}
+                isProcessing={isProcessing}
+                showPayment={selectedPlan.price > 0}
+              />
 
-              {/* Order Summary */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Resumen del pedido</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-700">
-                      {selectedPlan.name} ({billingCycle === 'monthly' ? 'Mensual' : 'Anual'})
-                    </span>
-                    <span className="font-semibold">
-                      {selectedPlan.price === 0 ? 'Gratis' : formatPrice(getCurrentPrice())}
-                    </span>
-                  </div>
-                  {billingCycle === 'annual' && selectedPlan.price > 0 && (
-                    <div className="flex justify-between items-center text-sm text-green-600">
-                      <span>Descuento anual</span>
-                      <span>-{formatPrice(getAnnualDiscount())}</span>
-                    </div>
-                  )}
-                  {selectedPlan.price > 0 && (
-                    <>
-                      <div className="flex justify-between items-center text-sm text-gray-600">
-                        <span>IVA (19%)</span>
-                        <span>{formatPrice(getCurrentPrice() * 0.19)}</span>
-                      </div>
-                      <Separator />
-                      <div className="flex justify-between items-center text-lg font-bold">
-                        <span>Total</span>
-                        <span className="text-teal-600">
-                          {formatPrice(getCurrentPrice() * 1.19)}
-                        </span>
-                      </div>
-                    </>
-                  )}
-                </CardContent>
-              </Card>
+              <OrderSummary
+                selectedPlan={selectedPlan}
+                billingCycle={billingCycle}
+                getCurrentPrice={getCurrentPrice}
+                getAnnualDiscount={getAnnualDiscount}
+                formatPrice={formatPrice}
+              />
 
-              {/* Submit Button */}
               <Button 
                 type="submit" 
                 className="w-full bg-teal-600 hover:bg-teal-700 text-white py-6 text-lg font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
