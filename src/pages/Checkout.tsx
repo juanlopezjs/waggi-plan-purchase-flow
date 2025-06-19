@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -8,13 +7,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { ArrowLeft, Check, CreditCard, User, Heart, Calendar } from 'lucide-react';
+import { ArrowLeft, Check, CreditCard, User, Heart, Loader2 } from 'lucide-react';
 
 const Checkout = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const planType = searchParams.get('plan') || 'huellito';
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly');
+  const [isProcessing, setIsProcessing] = useState(false);
   
   const [customerInfo, setCustomerInfo] = useState({
     name: '',
@@ -23,6 +23,13 @@ const Checkout = () => {
     petName: '',
     petBreed: '',
     address: ''
+  });
+
+  const [paymentInfo, setPaymentInfo] = useState({
+    cardNumber: '',
+    cardName: '',
+    expiry: '',
+    cvv: ''
   });
 
   const plans = {
@@ -90,16 +97,69 @@ const Checkout = () => {
     setCustomerInfo(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handlePaymentChange = (field: string, value: string) => {
+    setPaymentInfo(prev => ({ ...prev, [field]: value }));
+  };
+
+  const simulatePaymentProcessing = async () => {
+    // Simular diferentes escenarios de pago
+    const scenarios = [
+      { success: true, probability: 0.7 }, // 70% éxito
+      { success: false, error: 'payment', probability: 0.15 }, // 15% error de pago
+      { success: false, error: 'cancelled', probability: 0.1 }, // 10% cancelado
+      { success: false, error: 'expired', probability: 0.05 }, // 5% expirado
+    ];
+
+    const random = Math.random();
+    let cumulative = 0;
+    
+    for (const scenario of scenarios) {
+      cumulative += scenario.probability;
+      if (random <= cumulative) {
+        // Simular tiempo de procesamiento
+        await new Promise(resolve => setTimeout(resolve, 2000 + Math.random() * 3000));
+        return scenario;
+      }
+    }
+    
+    return scenarios[0]; // fallback a éxito
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsProcessing(true);
+
     console.log('Procesando compra:', { 
       plan: selectedPlan, 
       billingCycle, 
       finalPrice: getCurrentPrice(),
-      customer: customerInfo 
+      customer: customerInfo,
+      payment: paymentInfo
     });
-    alert('¡Compra exitosa! Bienvenido a Waggi');
-    navigate('/');
+
+    try {
+      // Para plan gratuito, siempre es exitoso
+      if (selectedPlan.price === 0) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        navigate('/success');
+        return;
+      }
+
+      // Simular procesamiento de pago
+      const result = await simulatePaymentProcessing();
+      
+      if (result.success) {
+        navigate('/success');
+      } else {
+        const errorType = result.error || 'payment';
+        navigate(`/error?type=${errorType}&plan=${planType}`);
+      }
+    } catch (error) {
+      console.error('Error procesando pago:', error);
+      navigate(`/error?type=payment&plan=${planType}`);
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const formatPrice = (price: number) => {
@@ -119,6 +179,7 @@ const Checkout = () => {
             variant="ghost" 
             onClick={() => navigate('/')}
             className="flex items-center gap-2 text-teal-700 hover:bg-teal-100"
+            disabled={isProcessing}
           >
             <ArrowLeft className="w-4 h-4" />
             Volver a planes
@@ -222,6 +283,7 @@ const Checkout = () => {
                       onChange={(e) => handleInputChange('name', e.target.value)}
                       placeholder="Tu nombre completo"
                       required
+                      disabled={isProcessing}
                     />
                   </div>
                   <div className="space-y-2">
@@ -233,6 +295,7 @@ const Checkout = () => {
                       onChange={(e) => handleInputChange('email', e.target.value)}
                       placeholder="tu@email.com"
                       required
+                      disabled={isProcessing}
                     />
                   </div>
                   <div className="space-y-2">
@@ -243,6 +306,7 @@ const Checkout = () => {
                       onChange={(e) => handleInputChange('phone', e.target.value)}
                       placeholder="+57 300 123 4567"
                       required
+                      disabled={isProcessing}
                     />
                   </div>
                   <div className="space-y-2">
@@ -252,6 +316,7 @@ const Checkout = () => {
                       value={customerInfo.address}
                       onChange={(e) => handleInputChange('address', e.target.value)}
                       placeholder="Tu dirección"
+                      disabled={isProcessing}
                     />
                   </div>
                 </CardContent>
@@ -274,6 +339,7 @@ const Checkout = () => {
                       onChange={(e) => handleInputChange('petName', e.target.value)}
                       placeholder="Nombre de tu mascota"
                       required
+                      disabled={isProcessing}
                     />
                   </div>
                   <div className="space-y-2">
@@ -283,6 +349,7 @@ const Checkout = () => {
                       value={customerInfo.petBreed}
                       onChange={(e) => handleInputChange('petBreed', e.target.value)}
                       placeholder="Raza de tu mascota"
+                      disabled={isProcessing}
                     />
                   </div>
                 </CardContent>
@@ -308,32 +375,44 @@ const Checkout = () => {
                         <Label htmlFor="cardNumber">Número de tarjeta *</Label>
                         <Input
                           id="cardNumber"
+                          value={paymentInfo.cardNumber}
+                          onChange={(e) => handlePaymentChange('cardNumber', e.target.value)}
                           placeholder="1234 5678 9012 3456"
                           required
+                          disabled={isProcessing}
                         />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="cardName">Nombre en la tarjeta *</Label>
                         <Input
                           id="cardName"
+                          value={paymentInfo.cardName}
+                          onChange={(e) => handlePaymentChange('cardName', e.target.value)}
                           placeholder="Como aparece en tu tarjeta"
                           required
+                          disabled={isProcessing}
                         />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="expiry">Fecha de vencimiento *</Label>
                         <Input
                           id="expiry"
+                          value={paymentInfo.expiry}
+                          onChange={(e) => handlePaymentChange('expiry', e.target.value)}
                           placeholder="MM/AA"
                           required
+                          disabled={isProcessing}
                         />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="cvv">CVV *</Label>
                         <Input
                           id="cvv"
+                          value={paymentInfo.cvv}
+                          onChange={(e) => handlePaymentChange('cvv', e.target.value)}
                           placeholder="123"
                           required
+                          disabled={isProcessing}
                         />
                       </div>
                     </div>
@@ -382,9 +461,17 @@ const Checkout = () => {
               {/* Submit Button */}
               <Button 
                 type="submit" 
-                className="w-full bg-teal-600 hover:bg-teal-700 text-white py-6 text-lg font-semibold rounded-lg transition-colors"
+                className="w-full bg-teal-600 hover:bg-teal-700 text-white py-6 text-lg font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={isProcessing}
               >
-                {selectedPlan.price === 0 ? 'Activar plan gratuito' : 'Completar compra'}
+                {isProcessing ? (
+                  <>
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                    Procesando pago...
+                  </>
+                ) : (
+                  selectedPlan.price === 0 ? 'Activar plan gratuito' : 'Completar compra'
+                )}
               </Button>
 
               <p className="text-xs text-gray-500 text-center">
