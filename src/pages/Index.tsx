@@ -1,10 +1,9 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Check, Heart, Users, BookOpen } from 'lucide-react';
+import { Check, Heart, Users, BookOpen, MessageCircle } from 'lucide-react';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -77,6 +76,10 @@ const Index = () => {
     navigate(`/checkout?plan=${planId}`);
   };
 
+  const handleGoToChat = () => {
+    navigate('/chat');
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-teal-50 to-amber-50">
       {/* Header */}
@@ -86,9 +89,18 @@ const Index = () => {
             <Heart className="w-8 h-8 text-teal-600" />
             <h1 className="text-4xl font-bold text-gray-900">Waggi</h1>
           </div>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-6">
             Cuida a tu mascota con nuestros planes de grooming y servicios veterinarios especializados
           </p>
+          
+          {/* Chat Bot Button */}
+          <Button 
+            onClick={handleGoToChat}
+            className="bg-teal-600 hover:bg-teal-700 text-white font-semibold py-3 px-6 rounded-lg mb-8"
+          >
+            <MessageCircle className="w-5 h-5 mr-2" />
+            Consulta con WaggiBot
+          </Button>
         </div>
 
         {/* Features */}
