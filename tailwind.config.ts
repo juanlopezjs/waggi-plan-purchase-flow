@@ -69,6 +69,19 @@ export default {
 					'secondary-foreground': 'hsl(var(--pet-secondary-foreground))',
 					accent: 'hsl(var(--pet-accent))',
 					'accent-foreground': 'hsl(var(--pet-accent-foreground))'
+				},
+				pack: {
+					background: 'hsl(var(--pack-background))',
+					foreground: 'hsl(var(--pack-foreground))',
+					primary: 'hsl(var(--pack-primary))',
+					'primary-foreground': 'hsl(var(--pack-primary-foreground))',
+					secondary: 'hsl(var(--pack-secondary))',
+					'secondary-foreground': 'hsl(var(--pack-secondary-foreground))',
+					accent: 'hsl(var(--pack-accent))',
+					'accent-foreground': 'hsl(var(--pack-accent-foreground))',
+					muted: 'hsl(var(--pack-muted))',
+					'muted-foreground': 'hsl(var(--pack-muted-foreground))',
+					border: 'hsl(var(--pack-border))'
 				}
 			},
 			borderRadius: {

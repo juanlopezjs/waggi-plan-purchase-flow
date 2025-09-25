@@ -59,6 +59,19 @@
     --pet-secondary-foreground: 0 0% 100%;
     --pet-accent: 220 13% 91%;
     --pet-accent-foreground: 220 9% 46%;
+
+    /* Pack-specific colors */
+    --pack-background: 220 100% 97%;
+    --pack-foreground: 220 15% 15%;
+    --pack-primary: 268 100% 65%;
+    --pack-primary-foreground: 0 0% 98%;
+    --pack-secondary: 268 20% 95%;
+    --pack-secondary-foreground: 268 20% 15%;
+    --pack-accent: 45 100% 60%;
+    --pack-accent-foreground: 45 100% 10%;
+    --pack-muted: 220 15% 95%;
+    --pack-muted-foreground: 220 10% 40%;
+    --pack-border: 220 15% 90%;
   }
 
   .dark {
@@ -105,6 +118,19 @@
     --pet-secondary-foreground: 0 0% 100%;
     --pet-accent: 240 3.7% 15.9%;
     --pet-accent-foreground: 240 4.8% 95.9%;
+
+    /* Pack-specific dark colors */
+    --pack-background: 220 15% 10%;
+    --pack-foreground: 220 15% 95%;
+    --pack-primary: 268 80% 70%;
+    --pack-primary-foreground: 0 0% 5%;
+    --pack-secondary: 268 30% 15%;
+    --pack-secondary-foreground: 268 30% 85%;
+    --pack-accent: 45 80% 55%;
+    --pack-accent-foreground: 45 80% 5%;
+    --pack-muted: 220 15% 15%;
+    --pack-muted-foreground: 220 10% 60%;
+    --pack-border: 220 15% 20%;
   }
 }
 
