@@ -80,6 +80,10 @@ const Index = () => {
     navigate('/chat');
   };
 
+  const handleGoToPets = () => {
+    navigate('/pets');
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-teal-50 to-amber-50">
       {/* Header */}
@@ -93,14 +97,24 @@ const Index = () => {
             Cuida a tu mascota con nuestros planes de grooming y servicios veterinarios especializados
           </p>
           
-          {/* Chat Bot Button */}
-          <Button 
-            onClick={handleGoToChat}
-            className="bg-teal-600 hover:bg-teal-700 text-white font-semibold py-3 px-6 rounded-lg mb-8"
-          >
-            <MessageCircle className="w-5 h-5 mr-2" />
-            Consulta con WaggiBot
-          </Button>
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+            <Button 
+              onClick={handleGoToChat}
+              className="bg-teal-600 hover:bg-teal-700 text-white font-semibold py-3 px-6 rounded-lg"
+            >
+              <MessageCircle className="w-5 h-5 mr-2" />
+              Consulta con WaggiBot
+            </Button>
+            <Button 
+              onClick={handleGoToPets}
+              variant="outline"
+              className="border-teal-600 text-teal-600 hover:bg-teal-600 hover:text-white font-semibold py-3 px-6 rounded-lg"
+            >
+              <Heart className="w-5 h-5 mr-2" />
+              Gestionar Mascotas
+            </Button>
+          </div>
         </div>
 
         {/* Features */}

@@ -51,6 +51,14 @@
     --sidebar-border: 220 13% 91%;
 
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Pet management specific tokens */
+    --pet-primary: 175 100% 31%;
+    --pet-primary-foreground: 0 0% 100%;
+    --pet-secondary: 45 93% 47%;
+    --pet-secondary-foreground: 0 0% 100%;
+    --pet-accent: 220 13% 91%;
+    --pet-accent-foreground: 220 9% 46%;
   }
 
   .dark {
@@ -89,6 +97,14 @@
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Pet management dark mode tokens */
+    --pet-primary: 175 100% 31%;
+    --pet-primary-foreground: 0 0% 100%;
+    --pet-secondary: 45 93% 47%;
+    --pet-secondary-foreground: 0 0% 100%;
+    --pet-accent: 240 3.7% 15.9%;
+    --pet-accent-foreground: 240 4.8% 95.9%;
   }
 }
 
