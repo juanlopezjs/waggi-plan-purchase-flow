@@ -16,15 +16,24 @@ import {
   Settings,
   MoreVertical,
   Copy,
-  Share2
+  Share2,
+  Calendar,
+  Plus,
+  Gift,
+  Cake
 } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { EventCard } from './EventCard';
+import { CreateEventDialog } from './CreateEventDialog';
+import { format, isToday, isTomorrow } from 'date-fns';
+import { es } from 'date-fns/locale';
 
 interface PackMember {
   id: number;
   name: string;
   role: 'owner' | 'member';
   avatar: string;
+  birthDate?: string;
 }
 
 interface PackPet {
@@ -32,6 +41,20 @@ interface PackPet {
   name: string;
   type: string;
   avatar: string;
+  birthDate?: string;
+}
+
+interface PackEvent {
+  id: string | number;
+  title: string;
+  description: string;
+  date: string;
+  time: string;
+  location?: string;
+  type: 'event' | 'birthday';
+  attendees?: number;
+  createdBy: string;
+  canDelete: boolean;
 }
 
 interface PackDetailsProps {
@@ -42,6 +65,7 @@ interface PackDetailsProps {
     description: string;
     members: PackMember[];
     pets: PackPet[];
+    events: PackEvent[];
     createdAt: string;
     isOwner: boolean;
   };
@@ -51,6 +75,8 @@ interface PackDetailsProps {
 export const PackDetails: React.FC<PackDetailsProps> = ({ pack, onClose }) => {
   const [inviteEmail, setInviteEmail] = useState('');
   const [isInviting, setIsInviting] = useState(false);
+  const [isCreateEventOpen, setIsCreateEventOpen] = useState(false);
+  const [events, setEvents] = useState<PackEvent[]>(pack.events);
 
   const packTypeConfig = {
     family: {
@@ -85,6 +111,88 @@ export const PackDetails: React.FC<PackDetailsProps> = ({ pack, onClose }) => {
     // Lógica para compartir la manada
     navigator.clipboard.writeText(`https://waggi.app/packs/${pack.id}`);
   };
+
+  const handleCreateEvent = (eventData: any) => {
+    const newEvent: PackEvent = {
+      id: Date.now(), // En una app real, esto vendría del servidor
+      ...eventData,
+      type: 'event',
+      createdBy: 'Usuario actual', // En una app real, esto vendría del contexto del usuario
+      canDelete: true,
+      attendees: 0
+    };
+    
+    setEvents(prev => [...prev, newEvent]);
+  };
+
+  const handleDeleteEvent = (eventId: string | number) => {
+    setEvents(prev => prev.filter(event => event.id !== eventId));
+  };
+
+  // Generar cumpleaños para miembros y mascotas
+  const getBirthdayEvents = (): PackEvent[] => {
+    const birthdayEvents: PackEvent[] = [];
+    
+    // Cumpleaños de miembros
+    pack.members.forEach(member => {
+      if (member.birthDate) {
+        const currentYear = new Date().getFullYear();
+        const birthDate = new Date(member.birthDate);
+        const nextBirthday = new Date(currentYear, birthDate.getMonth(), birthDate.getDate());
+        
+        // Si ya pasó este año, usar el próximo año
+        if (nextBirthday < new Date()) {
+          nextBirthday.setFullYear(currentYear + 1);
+        }
+        
+        birthdayEvents.push({
+          id: `member-birthday-${member.id}`,
+          title: `Cumpleaños de ${member.name}`,
+          description: `¡${member.name} está cumpliendo años!`,
+          date: nextBirthday.toISOString().split('T')[0],
+          time: '00:00',
+          type: 'birthday',
+          createdBy: 'Sistema',
+          canDelete: false
+        });
+      }
+    });
+    
+    // Cumpleaños de mascotas
+    pack.pets.forEach(pet => {
+      if (pet.birthDate) {
+        const currentYear = new Date().getFullYear();
+        const birthDate = new Date(pet.birthDate);
+        const nextBirthday = new Date(currentYear, birthDate.getMonth(), birthDate.getDate());
+        
+        // Si ya pasó este año, usar el próximo año
+        if (nextBirthday < new Date()) {
+          nextBirthday.setFullYear(currentYear + 1);
+        }
+        
+        birthdayEvents.push({
+          id: `pet-birthday-${pet.id}`,
+          title: `Cumpleaños de ${pet.name}`,
+          description: `¡${pet.name} está cumpliendo años! 🎉`,
+          date: nextBirthday.toISOString().split('T')[0],
+          time: '00:00',
+          type: 'birthday',
+          createdBy: 'Sistema',
+          canDelete: false
+        });
+      }
+    });
+    
+    return birthdayEvents;
+  };
+
+  const allEvents = [...events, ...getBirthdayEvents()].sort((a, b) => 
+    new Date(`${a.date}T${a.time}`).getTime() - new Date(`${b.date}T${b.time}`).getTime()
+  );
+
+  const upcomingEvents = allEvents.filter(event => 
+    new Date(`${event.date}T${event.time}`) >= new Date()
+  ).slice(0, 3);
 
   return (
     <Card className="bg-white/80 backdrop-blur-sm border-pack-border sticky top-24">
@@ -137,10 +245,53 @@ export const PackDetails: React.FC<PackDetailsProps> = ({ pack, onClose }) => {
           </p>
         )}
 
+        {/* Próximos eventos */}
+        {upcomingEvents.length > 0 && (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-medium text-pack-foreground flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-pack-primary" />
+                Próximos eventos
+              </h3>
+            </div>
+            <div className="space-y-2">
+              {upcomingEvents.map((event) => {
+                const eventDate = new Date(`${event.date}T${event.time}`);
+                let dateLabel = format(eventDate, "d 'de' MMM", { locale: es });
+                
+                if (isToday(eventDate)) dateLabel = "Hoy";
+                else if (isTomorrow(eventDate)) dateLabel = "Mañana";
+                
+                return (
+                  <div 
+                    key={event.id} 
+                    className="flex items-center gap-3 p-2 bg-pack-muted/30 rounded-lg"
+                  >
+                    {event.type === 'birthday' ? (
+                      <Cake className="w-4 h-4 text-pack-accent" />
+                    ) : (
+                      <Calendar className="w-4 h-4 text-pack-primary" />
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium text-pack-foreground truncate">
+                        {event.title}
+                      </p>
+                      <p className="text-xs text-pack-muted-foreground">
+                        {dateLabel}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         <Tabs defaultValue="members" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="members">Miembros</TabsTrigger>
             <TabsTrigger value="pets">Mascotas</TabsTrigger>
+            <TabsTrigger value="events">Eventos</TabsTrigger>
           </TabsList>
 
           <TabsContent value="members" className="space-y-4">
@@ -226,6 +377,42 @@ export const PackDetails: React.FC<PackDetailsProps> = ({ pack, onClose }) => {
               )}
             </div>
           </TabsContent>
+
+          <TabsContent value="events" className="space-y-4">
+            {/* Crear evento */}
+            {pack.isOwner && (
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  onClick={() => setIsCreateEventOpen(true)}
+                  className="bg-pack-primary hover:bg-pack-primary/90 text-pack-primary-foreground"
+                >
+                  <Plus className="w-3 h-3 mr-1" />
+                  Crear Evento
+                </Button>
+              </div>
+            )}
+
+            {/* Lista de eventos */}
+            <div className="space-y-3">
+              {allEvents.length === 0 ? (
+                <div className="text-center py-6">
+                  <Calendar className="w-12 h-12 text-pack-muted-foreground mx-auto mb-2" />
+                  <p className="text-sm text-pack-muted-foreground">
+                    No hay eventos programados
+                  </p>
+                </div>
+              ) : (
+                allEvents.map((event) => (
+                  <EventCard
+                    key={event.id}
+                    event={event}
+                    onDelete={handleDeleteEvent}
+                  />
+                ))
+              )}
+            </div>
+          </TabsContent>
         </Tabs>
 
         {/* Quick Actions */}
@@ -242,6 +429,13 @@ export const PackDetails: React.FC<PackDetailsProps> = ({ pack, onClose }) => {
           </div>
         </div>
       </CardContent>
+
+      {/* Dialog para crear evento */}
+      <CreateEventDialog 
+        open={isCreateEventOpen}
+        onOpenChange={setIsCreateEventOpen}
+        onCreateEvent={handleCreateEvent}
+      />
     </Card>
   );
 };

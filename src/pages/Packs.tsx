@@ -21,9 +21,10 @@ const mockPacks = [
       { id: 3, name: "Ana López", role: "member" as const, avatar: "/placeholder.svg" }
     ],
     pets: [
-      { id: 1, name: "Max", type: "Perro", avatar: "/placeholder.svg" },
-      { id: 2, name: "Luna", type: "Gato", avatar: "/placeholder.svg" }
+      { id: 1, name: "Max", type: "Perro", avatar: "/placeholder.svg", birthDate: "2022-03-15" },
+      { id: 2, name: "Luna", type: "Gato", avatar: "/placeholder.svg", birthDate: "2021-07-20" }
     ],
+    events: [],
     createdAt: "2024-01-15",
     isOwner: true
   },
@@ -38,9 +39,23 @@ const mockPacks = [
       { id: 5, name: "Diego Ruiz", role: "member" as const, avatar: "/placeholder.svg" }
     ],
     pets: [
-      { id: 3, name: "Buddy", type: "Perro", avatar: "/placeholder.svg" },
-      { id: 4, name: "Goldie", type: "Perro", avatar: "/placeholder.svg" },
-      { id: 5, name: "Cooper", type: "Perro", avatar: "/placeholder.svg" }
+      { id: 3, name: "Buddy", type: "Perro", avatar: "/placeholder.svg", birthDate: "2020-12-10" },
+      { id: 4, name: "Goldie", type: "Perro", avatar: "/placeholder.svg", birthDate: "2019-09-05" },
+      { id: 5, name: "Cooper", type: "Perro", avatar: "/placeholder.svg", birthDate: "2023-01-28" }
+    ],
+    events: [
+      {
+        id: 1,
+        title: "Paseo grupal en el parque",
+        description: "Encuentro semanal en el Parque Central para socializar nuestros Golden Retrievers",
+        date: "2024-01-30",
+        time: "16:00",
+        location: "Parque Central - Entrada principal",
+        type: "event" as const,
+        attendees: 5,
+        createdBy: "Pedro Martín",
+        canDelete: false
+      }
     ],
     createdAt: "2024-02-20",
     isOwner: false
