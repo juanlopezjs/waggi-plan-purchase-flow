@@ -51,7 +51,6 @@ interface PackEvent {
   date: string;
   time: string;
   location?: string;
-  type: 'event' | 'birthday';
   attendees?: number;
   createdBy: string;
   canDelete: boolean;
@@ -116,7 +115,6 @@ export const PackDetails: React.FC<PackDetailsProps> = ({ pack, onClose }) => {
     const newEvent: PackEvent = {
       id: Date.now(), // En una app real, esto vendría del servidor
       ...eventData,
-      type: 'event',
       createdBy: 'Usuario actual', // En una app real, esto vendría del contexto del usuario
       canDelete: true,
       attendees: 0
@@ -129,9 +127,14 @@ export const PackDetails: React.FC<PackDetailsProps> = ({ pack, onClose }) => {
     setEvents(prev => prev.filter(event => event.id !== eventId));
   };
 
-  // Generar cumpleaños para miembros y mascotas
-  const getBirthdayEvents = (): PackEvent[] => {
-    const birthdayEvents: PackEvent[] = [];
+  // Generar información de cumpleaños para miembros y mascotas
+  const getBirthdays = () => {
+    const birthdays: Array<{
+      id: string;
+      name: string;
+      date: string;
+      type: 'member' | 'pet';
+    }> = [];
     
     // Cumpleaños de miembros
     pack.members.forEach(member => {
@@ -145,15 +148,11 @@ export const PackDetails: React.FC<PackDetailsProps> = ({ pack, onClose }) => {
           nextBirthday.setFullYear(currentYear + 1);
         }
         
-        birthdayEvents.push({
+        birthdays.push({
           id: `member-birthday-${member.id}`,
-          title: `Cumpleaños de ${member.name}`,
-          description: `¡${member.name} está cumpliendo años!`,
+          name: member.name,
           date: nextBirthday.toISOString().split('T')[0],
-          time: '00:00',
-          type: 'birthday',
-          createdBy: 'Sistema',
-          canDelete: false
+          type: 'member'
         });
       }
     });
@@ -170,29 +169,34 @@ export const PackDetails: React.FC<PackDetailsProps> = ({ pack, onClose }) => {
           nextBirthday.setFullYear(currentYear + 1);
         }
         
-        birthdayEvents.push({
+        birthdays.push({
           id: `pet-birthday-${pet.id}`,
-          title: `Cumpleaños de ${pet.name}`,
-          description: `¡${pet.name} está cumpliendo años! 🎉`,
+          name: pet.name,
           date: nextBirthday.toISOString().split('T')[0],
-          time: '00:00',
-          type: 'birthday',
-          createdBy: 'Sistema',
-          canDelete: false
+          type: 'pet'
         });
       }
     });
     
-    return birthdayEvents;
+    return birthdays.sort((a, b) => 
+      new Date(a.date).getTime() - new Date(b.date).getTime()
+    );
   };
 
-  const allEvents = [...events, ...getBirthdayEvents()].sort((a, b) => 
+  // Solo eventos creados por usuarios (actividades)
+  const sortedEvents = events.sort((a, b) => 
     new Date(`${a.date}T${a.time}`).getTime() - new Date(`${b.date}T${b.time}`).getTime()
   );
 
-  const upcomingEvents = allEvents.filter(event => 
+  // Próximos eventos para mostrar en el resumen
+  const upcomingEvents = sortedEvents.filter(event => 
     new Date(`${event.date}T${event.time}`) >= new Date()
-  ).slice(0, 3);
+  ).slice(0, 2);
+
+  // Próximos cumpleaños para mostrar en el resumen
+  const upcomingBirthdays = getBirthdays().filter(birthday => 
+    new Date(birthday.date) >= new Date()
+  ).slice(0, 2);
 
   return (
     <Card className="bg-white/80 backdrop-blur-sm border-pack-border sticky top-24">
@@ -245,16 +249,17 @@ export const PackDetails: React.FC<PackDetailsProps> = ({ pack, onClose }) => {
           </p>
         )}
 
-        {/* Próximos eventos */}
-        {upcomingEvents.length > 0 && (
+        {/* Próximos eventos y cumpleaños */}
+        {(upcomingEvents.length > 0 || upcomingBirthdays.length > 0) && (
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-medium text-pack-foreground flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-pack-primary" />
-                Próximos eventos
+                Próximo
               </h3>
             </div>
             <div className="space-y-2">
+              {/* Mostrar eventos */}
               {upcomingEvents.map((event) => {
                 const eventDate = new Date(`${event.date}T${event.time}`);
                 let dateLabel = format(eventDate, "d 'de' MMM", { locale: es });
@@ -267,17 +272,39 @@ export const PackDetails: React.FC<PackDetailsProps> = ({ pack, onClose }) => {
                     key={event.id} 
                     className="flex items-center gap-3 p-2 bg-pack-muted/30 rounded-lg"
                   >
-                    {event.type === 'birthday' ? (
-                      <Cake className="w-4 h-4 text-pack-accent" />
-                    ) : (
-                      <Calendar className="w-4 h-4 text-pack-primary" />
-                    )}
+                    <Calendar className="w-4 h-4 text-pack-primary" />
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-medium text-pack-foreground truncate">
                         {event.title}
                       </p>
                       <p className="text-xs text-pack-muted-foreground">
-                        {dateLabel}
+                        {dateLabel} • {event.time}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+              
+              {/* Mostrar cumpleaños */}
+              {upcomingBirthdays.map((birthday) => {
+                const birthdayDate = new Date(birthday.date);
+                let dateLabel = format(birthdayDate, "d 'de' MMM", { locale: es });
+                
+                if (isToday(birthdayDate)) dateLabel = "Hoy";
+                else if (isTomorrow(birthdayDate)) dateLabel = "Mañana";
+                
+                return (
+                  <div 
+                    key={birthday.id} 
+                    className="flex items-center gap-3 p-2 bg-pack-accent/10 rounded-lg"
+                  >
+                    <Cake className="w-4 h-4 text-pack-accent" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium text-pack-foreground truncate">
+                        Cumpleaños de {birthday.name}
+                      </p>
+                      <p className="text-xs text-pack-muted-foreground">
+                        {dateLabel} • {birthday.type === 'member' ? 'Miembro' : 'Mascota'}
                       </p>
                     </div>
                   </div>
@@ -288,10 +315,11 @@ export const PackDetails: React.FC<PackDetailsProps> = ({ pack, onClose }) => {
         )}
 
         <Tabs defaultValue="members" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="members">Miembros</TabsTrigger>
             <TabsTrigger value="pets">Mascotas</TabsTrigger>
             <TabsTrigger value="events">Eventos</TabsTrigger>
+            <TabsTrigger value="birthdays">Cumpleaños</TabsTrigger>
           </TabsList>
 
           <TabsContent value="members" className="space-y-4">
@@ -395,7 +423,7 @@ export const PackDetails: React.FC<PackDetailsProps> = ({ pack, onClose }) => {
 
             {/* Lista de eventos */}
             <div className="space-y-3">
-              {allEvents.length === 0 ? (
+              {sortedEvents.length === 0 ? (
                 <div className="text-center py-6">
                   <Calendar className="w-12 h-12 text-pack-muted-foreground mx-auto mb-2" />
                   <p className="text-sm text-pack-muted-foreground">
@@ -403,13 +431,83 @@ export const PackDetails: React.FC<PackDetailsProps> = ({ pack, onClose }) => {
                   </p>
                 </div>
               ) : (
-                allEvents.map((event) => (
+                sortedEvents.map((event) => (
                   <EventCard
                     key={event.id}
                     event={event}
                     onDelete={handleDeleteEvent}
                   />
                 ))
+              )}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="birthdays" className="space-y-4">
+            {/* Lista de cumpleaños */}
+            <div className="space-y-3">
+              {getBirthdays().length === 0 ? (
+                <div className="text-center py-6">
+                  <Cake className="w-12 h-12 text-pack-muted-foreground mx-auto mb-2" />
+                  <p className="text-sm text-pack-muted-foreground">
+                    No hay cumpleaños registrados
+                  </p>
+                </div>
+              ) : (
+                getBirthdays().map((birthday) => {
+                  const birthdayDate = new Date(birthday.date);
+                  const isUpcoming = birthdayDate >= new Date();
+                  
+                  return (
+                    <Card 
+                      key={birthday.id} 
+                      className={`bg-white/80 backdrop-blur-sm border-pack-border ${!isUpcoming ? 'opacity-75' : ''}`}
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                            birthday.type === 'member' 
+                              ? 'bg-pack-primary/10' 
+                              : 'bg-pack-accent/10'
+                          }`}>
+                            <Cake className={`w-5 h-5 ${
+                              birthday.type === 'member' 
+                                ? 'text-pack-primary' 
+                                : 'text-pack-accent'
+                            }`} />
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <h4 className="font-semibold text-pack-foreground text-sm">
+                                Cumpleaños de {birthday.name}
+                              </h4>
+                              <Badge 
+                                variant="secondary" 
+                                className={`${
+                                  birthday.type === 'member' 
+                                    ? 'bg-pack-primary/10 text-pack-primary' 
+                                    : 'bg-pack-accent/10 text-pack-accent'
+                                } text-xs`}
+                              >
+                                {birthday.type === 'member' ? 'Miembro' : 'Mascota'}
+                              </Badge>
+                            </div>
+                            <div className="flex items-center gap-2 text-xs text-pack-muted-foreground mt-1">
+                              <Calendar className="w-3 h-3" />
+                              <span>
+                                {format(birthdayDate, "d 'de' MMMM, yyyy", { locale: es })}
+                              </span>
+                              {!isUpcoming && (
+                                <Badge variant="outline" className="text-xs ml-2">
+                                  Pasado
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })
               )}
             </div>
           </TabsContent>

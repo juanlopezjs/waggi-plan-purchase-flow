@@ -7,9 +7,7 @@ import {
   Clock, 
   MapPin, 
   Users, 
-  Trash2,
-  Gift,
-  Heart
+  Trash2
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -21,7 +19,6 @@ interface PackEvent {
   date: string;
   time: string;
   location?: string;
-  type: 'event' | 'birthday';
   attendees?: number;
   createdBy: string;
   canDelete: boolean;
@@ -35,7 +32,6 @@ interface EventCardProps {
 export const EventCard: React.FC<EventCardProps> = ({ event, onDelete }) => {
   const eventDate = new Date(`${event.date}T${event.time}`);
   const isUpcoming = eventDate > new Date();
-  const isBirthday = event.type === 'birthday';
 
   const handleDelete = () => {
     if (window.confirm('¿Estás seguro de que deseas eliminar este evento?')) {
@@ -49,19 +45,15 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onDelete }) => {
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 space-y-2">
             <div className="flex items-center gap-2">
-              {isBirthday ? (
-                <Gift className="w-4 h-4 text-pack-accent" />
-              ) : (
-                <Calendar className="w-4 h-4 text-pack-primary" />
-              )}
+              <Calendar className="w-4 h-4 text-pack-primary" />
               <h4 className="font-semibold text-pack-foreground text-sm">
                 {event.title}
               </h4>
               <Badge 
                 variant="secondary" 
-                className={`${isBirthday ? 'bg-pack-accent/10 text-pack-accent' : 'bg-pack-primary/10 text-pack-primary'} text-xs`}
+                className="bg-pack-primary/10 text-pack-primary text-xs"
               >
-                {isBirthday ? 'Cumpleaños' : 'Evento'}
+                Evento
               </Badge>
             </div>
             
