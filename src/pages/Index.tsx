@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Check, Heart, Users, BookOpen, MessageCircle } from 'lucide-react';
+import { Check, Heart, Users, BookOpen, MessageCircle, Sparkles } from 'lucide-react';
 
 const Index = () => {
   const navigate = useNavigate();
+  // Simulación de puntos del usuario (en producción vendría de la base de datos)
+  const [userPoints] = useState(250);
 
   const plans = [
     {
@@ -97,6 +99,15 @@ const Index = () => {
             <Heart className="w-8 h-8 text-teal-600" />
             <h1 className="text-4xl font-bold text-gray-900">Waggi</h1>
           </div>
+          
+          {/* User Points Badge */}
+          <div className="flex justify-center mb-4">
+            <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 py-2 text-base">
+              <Sparkles className="w-4 h-4 mr-2" />
+              {userPoints.toLocaleString()} Puntos
+            </Badge>
+          </div>
+
           <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-6">
             Cuida a tu mascota con nuestros planes de grooming y servicios veterinarios especializados
           </p>

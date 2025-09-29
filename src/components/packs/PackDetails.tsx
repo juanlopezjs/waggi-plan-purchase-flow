@@ -25,6 +25,7 @@ import {
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { EventCard } from './EventCard';
 import { CreateEventDialog } from './CreateEventDialog';
+import { SendGiftDialog } from './SendGiftDialog';
 import { format, isToday, isTomorrow } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -75,6 +76,8 @@ export const PackDetails: React.FC<PackDetailsProps> = ({ pack, onClose }) => {
   const [inviteEmail, setInviteEmail] = useState('');
   const [isInviting, setIsInviting] = useState(false);
   const [isCreateEventOpen, setIsCreateEventOpen] = useState(false);
+  const [isGiftDialogOpen, setIsGiftDialogOpen] = useState(false);
+  const [selectedBirthday, setSelectedBirthday] = useState<{ name: string; type: 'member' | 'pet' } | null>(null);
   const [events, setEvents] = useState<PackEvent[]>(pack.events);
 
   const packTypeConfig = {
@@ -125,6 +128,16 @@ export const PackDetails: React.FC<PackDetailsProps> = ({ pack, onClose }) => {
 
   const handleDeleteEvent = (eventId: string | number) => {
     setEvents(prev => prev.filter(event => event.id !== eventId));
+  };
+
+  const handleSendGift = (name: string, type: 'member' | 'pet') => {
+    setSelectedBirthday({ name, type });
+    setIsGiftDialogOpen(true);
+  };
+
+  const handleGiftSent = (gift: any) => {
+    // Aquí se guardaría en la base de datos
+    console.log('Regalo enviado:', gift);
   };
 
   // Generar información de cumpleaños para miembros y mascotas
@@ -307,6 +320,14 @@ export const PackDetails: React.FC<PackDetailsProps> = ({ pack, onClose }) => {
                         {dateLabel} • {birthday.type === 'member' ? 'Miembro' : 'Mascota'}
                       </p>
                     </div>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="text-pack-primary hover:text-pack-primary hover:bg-pack-primary/10"
+                      onClick={() => handleSendGift(birthday.name, birthday.type)}
+                    >
+                      <Gift className="w-4 h-4" />
+                    </Button>
                   </div>
                 );
               })}
@@ -503,6 +524,16 @@ export const PackDetails: React.FC<PackDetailsProps> = ({ pack, onClose }) => {
                               )}
                             </div>
                           </div>
+                          {isUpcoming && (
+                            <Button
+                              size="sm"
+                              className="bg-pack-primary hover:bg-pack-primary/90"
+                              onClick={() => handleSendGift(birthday.name, birthday.type)}
+                            >
+                              <Gift className="w-4 h-4 mr-1" />
+                              Enviar Regalo
+                            </Button>
+                          )}
                         </div>
                       </CardContent>
                     </Card>
@@ -534,6 +565,17 @@ export const PackDetails: React.FC<PackDetailsProps> = ({ pack, onClose }) => {
         onOpenChange={setIsCreateEventOpen}
         onCreateEvent={handleCreateEvent}
       />
+
+      {/* Dialog para enviar regalo */}
+      {selectedBirthday && (
+        <SendGiftDialog
+          open={isGiftDialogOpen}
+          onOpenChange={setIsGiftDialogOpen}
+          recipientName={selectedBirthday.name}
+          recipientType={selectedBirthday.type}
+          onGiftSent={handleGiftSent}
+        />
+      )}
     </Card>
   );
 };
