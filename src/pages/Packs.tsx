@@ -9,12 +9,10 @@ import { CreatePackDialog } from '@/components/packs/CreatePackDialog';
 import { PackDetails } from '@/components/packs/PackDetails';
 
 // Mock data para demostración
-// Nota: Para testing, algunas fechas de cumpleaños están ajustadas a hoy
+// Nota: María López y Luna tienen cumpleaños HOY para testing
 const today = new Date();
-const todayString = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-
-// Convertir la fecha de hoy al formato de año anterior para simular cumpleaños
-const lastYearBirthday = `${today.getFullYear() - 1}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+const currentMonth = String(today.getMonth() + 1).padStart(2, '0'); // Octubre = 10
+const currentDay = String(today.getDate()).padStart(2, '0'); // 01
 
 const mockPacks = [
   {
@@ -24,13 +22,13 @@ const mockPacks = [
     petType: "any" as const,
     description: "Manada familiar para compartir el cuidado de nuestras mascotas",
     members: [
-      { id: 1, name: "María López", role: "owner" as const, avatar: "/placeholder.svg", birthDate: lastYearBirthday }, // Cumpleaños hoy!
+      { id: 1, name: "María López", role: "owner" as const, avatar: "/placeholder.svg", birthDate: `1985-${currentMonth}-${currentDay}` }, // Cumpleaños HOY!
       { id: 2, name: "Carlos López", role: "member" as const, avatar: "/placeholder.svg", birthDate: "1982-11-03" },
       { id: 3, name: "Ana López", role: "member" as const, avatar: "/placeholder.svg", birthDate: "2010-08-22" }
     ],
     pets: [
       { id: 1, name: "Max", type: "Perro", avatar: "/placeholder.svg", birthDate: "2022-03-15" },
-      { id: 2, name: "Luna", type: "Gato", avatar: "/placeholder.svg", birthDate: lastYearBirthday } // Cumpleaños hoy!
+      { id: 2, name: "Luna", type: "Gato", avatar: "/placeholder.svg", birthDate: `2021-${currentMonth}-${currentDay}` } // Cumpleaños HOY!
     ],
     events: [],
     createdAt: "2024-01-15",
