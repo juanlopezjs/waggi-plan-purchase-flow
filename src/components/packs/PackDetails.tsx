@@ -62,6 +62,7 @@ interface PackDetailsProps {
     id: number;
     name: string;
     type: 'family' | 'open';
+    petType: 'dog' | 'cat' | 'any';
     description: string;
     members: PackMember[];
     pets: PackPet[];
@@ -97,6 +98,14 @@ export const PackDetails: React.FC<PackDetailsProps> = ({ pack, onClose }) => {
 
   const config = packTypeConfig[pack.type];
   const IconComponent = config.icon;
+
+  const petTypeConfig = {
+    dog: { emoji: '🐕', label: 'Solo Perros' },
+    cat: { emoji: '🐈', label: 'Solo Gatos' },
+    any: { emoji: '🐾', label: 'Cualquier Mascota' }
+  };
+
+  const petConfig = petTypeConfig[pack.petType];
 
   const handleInvite = async () => {
     if (!inviteEmail.trim()) return;
@@ -206,10 +215,10 @@ export const PackDetails: React.FC<PackDetailsProps> = ({ pack, onClose }) => {
     new Date(`${event.date}T${event.time}`) >= new Date()
   ).slice(0, 2);
 
-  // Próximos cumpleaños para mostrar en el resumen
-  const upcomingBirthdays = getBirthdays().filter(birthday => 
-    new Date(birthday.date) >= new Date()
-  ).slice(0, 2);
+  // Solo cumpleaños de HOY para mostrar en el resumen
+  const todayBirthdays = getBirthdays().filter(birthday => 
+    isToday(new Date(birthday.date))
+  );
 
   return (
     <Card className="bg-white/80 backdrop-blur-sm border-pack-border sticky top-24">
@@ -221,10 +230,15 @@ export const PackDetails: React.FC<PackDetailsProps> = ({ pack, onClose }) => {
             </div>
             <div>
               <CardTitle className="text-lg text-pack-foreground">{pack.name}</CardTitle>
-              <Badge variant="secondary" className={`${config.color} mt-1`}>
-                <IconComponent className="w-3 h-3 mr-1" />
-                {config.label}
-              </Badge>
+              <div className="flex items-center gap-2 mt-1">
+                <Badge variant="secondary" className={config.color}>
+                  <IconComponent className="w-3 h-3 mr-1" />
+                  {config.label}
+                </Badge>
+                <Badge variant="outline" className="text-xs">
+                  {petConfig.emoji} {petConfig.label}
+                </Badge>
+              </div>
             </div>
           </div>
           <div className="flex items-center gap-1">
@@ -262,8 +276,8 @@ export const PackDetails: React.FC<PackDetailsProps> = ({ pack, onClose }) => {
           </p>
         )}
 
-        {/* Próximos eventos y cumpleaños */}
-        {(upcomingEvents.length > 0 || upcomingBirthdays.length > 0) && (
+        {/* Próximos eventos y cumpleaños de hoy */}
+        {(upcomingEvents.length > 0 || todayBirthdays.length > 0) && (
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-medium text-pack-foreground flex items-center gap-2">
@@ -298,49 +312,40 @@ export const PackDetails: React.FC<PackDetailsProps> = ({ pack, onClose }) => {
                 );
               })}
               
-              {/* Mostrar cumpleaños */}
-              {upcomingBirthdays.map((birthday) => {
-                const birthdayDate = new Date(birthday.date);
-                let dateLabel = format(birthdayDate, "d 'de' MMM", { locale: es });
-                
-                if (isToday(birthdayDate)) dateLabel = "Hoy";
-                else if (isTomorrow(birthdayDate)) dateLabel = "Mañana";
-                
-                return (
-                  <div 
-                    key={birthday.id} 
-                    className="flex items-center gap-3 p-2 bg-pack-accent/10 rounded-lg"
-                  >
-                    <Cake className="w-4 h-4 text-pack-accent" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium text-pack-foreground truncate">
-                        Cumpleaños de {birthday.name}
-                      </p>
-                      <p className="text-xs text-pack-muted-foreground">
-                        {dateLabel} • {birthday.type === 'member' ? 'Miembro' : 'Mascota'}
-                      </p>
-                    </div>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="text-pack-primary hover:text-pack-primary hover:bg-pack-primary/10"
-                      onClick={() => handleSendGift(birthday.name, birthday.type)}
-                    >
-                      <Gift className="w-4 h-4" />
-                    </Button>
+              {/* Mostrar cumpleaños de HOY en amarillo */}
+              {todayBirthdays.map((birthday) => (
+                <div 
+                  key={birthday.id} 
+                  className="flex items-center gap-3 p-2 bg-yellow-100 border border-yellow-300 rounded-lg"
+                >
+                  <Cake className="w-4 h-4 text-yellow-600" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-yellow-900 truncate">
+                      🎉 ¡Cumpleaños de {birthday.name}!
+                    </p>
+                    <p className="text-xs text-yellow-700">
+                      Hoy • {birthday.type === 'member' ? 'Miembro' : 'Mascota'}
+                    </p>
                   </div>
-                );
-              })}
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="text-yellow-600 hover:text-yellow-700 hover:bg-yellow-200"
+                    onClick={() => handleSendGift(birthday.name, birthday.type)}
+                  >
+                    <Gift className="w-4 h-4" />
+                  </Button>
+                </div>
+              ))}
             </div>
           </div>
         )}
 
         <Tabs defaultValue="members" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="members">Miembros</TabsTrigger>
             <TabsTrigger value="pets">Mascotas</TabsTrigger>
             <TabsTrigger value="events">Eventos</TabsTrigger>
-            <TabsTrigger value="birthdays">Cumpleaños</TabsTrigger>
           </TabsList>
 
           <TabsContent value="members" className="space-y-4">
@@ -353,6 +358,11 @@ export const PackDetails: React.FC<PackDetailsProps> = ({ pack, onClose }) => {
                     Invitar {pack.type === 'family' ? 'familiar' : 'miembro'}
                   </span>
                 </div>
+                {pack.petType !== 'any' && (
+                  <p className="text-xs text-pack-muted-foreground bg-pack-muted/30 p-2 rounded">
+                    ℹ️ Solo usuarios con mascotas {pack.petType === 'dog' ? '🐕 perros' : '🐈 gatos'} pueden unirse a esta manada
+                  </p>
+                )}
                 <div className="flex gap-2">
                   <Input
                     placeholder="Email del invitado"
@@ -459,86 +469,6 @@ export const PackDetails: React.FC<PackDetailsProps> = ({ pack, onClose }) => {
                     onDelete={handleDeleteEvent}
                   />
                 ))
-              )}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="birthdays" className="space-y-4">
-            {/* Lista de cumpleaños */}
-            <div className="space-y-3">
-              {getBirthdays().length === 0 ? (
-                <div className="text-center py-6">
-                  <Cake className="w-12 h-12 text-pack-muted-foreground mx-auto mb-2" />
-                  <p className="text-sm text-pack-muted-foreground">
-                    No hay cumpleaños registrados
-                  </p>
-                </div>
-              ) : (
-                getBirthdays().map((birthday) => {
-                  const birthdayDate = new Date(birthday.date);
-                  const isUpcoming = birthdayDate >= new Date();
-                  
-                  return (
-                    <Card 
-                      key={birthday.id} 
-                      className={`bg-white/80 backdrop-blur-sm border-pack-border ${!isUpcoming ? 'opacity-75' : ''}`}
-                    >
-                      <CardContent className="p-4">
-                        <div className="flex items-center gap-3">
-                          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                            birthday.type === 'member' 
-                              ? 'bg-pack-primary/10' 
-                              : 'bg-pack-accent/10'
-                          }`}>
-                            <Cake className={`w-5 h-5 ${
-                              birthday.type === 'member' 
-                                ? 'text-pack-primary' 
-                                : 'text-pack-accent'
-                            }`} />
-                          </div>
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2">
-                              <h4 className="font-semibold text-pack-foreground text-sm">
-                                Cumpleaños de {birthday.name}
-                              </h4>
-                              <Badge 
-                                variant="secondary" 
-                                className={`${
-                                  birthday.type === 'member' 
-                                    ? 'bg-pack-primary/10 text-pack-primary' 
-                                    : 'bg-pack-accent/10 text-pack-accent'
-                                } text-xs`}
-                              >
-                                {birthday.type === 'member' ? 'Miembro' : 'Mascota'}
-                              </Badge>
-                            </div>
-                            <div className="flex items-center gap-2 text-xs text-pack-muted-foreground mt-1">
-                              <Calendar className="w-3 h-3" />
-                              <span>
-                                {format(birthdayDate, "d 'de' MMMM, yyyy", { locale: es })}
-                              </span>
-                              {!isUpcoming && (
-                                <Badge variant="outline" className="text-xs ml-2">
-                                  Pasado
-                                </Badge>
-                              )}
-                            </div>
-                          </div>
-                          {isUpcoming && (
-                            <Button
-                              size="sm"
-                              className="bg-pack-primary hover:bg-pack-primary/90"
-                              onClick={() => handleSendGift(birthday.name, birthday.type)}
-                            >
-                              <Gift className="w-4 h-4 mr-1" />
-                              Enviar Regalo
-                            </Button>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })
               )}
             </div>
           </TabsContent>

@@ -15,6 +15,7 @@ interface CreatePackDialogProps {
 
 export const CreatePackDialog: React.FC<CreatePackDialogProps> = ({ open, onOpenChange }) => {
   const [packType, setPackType] = useState<'family' | 'open'>('family');
+  const [petType, setPetType] = useState<'dog' | 'cat' | 'any'>('any');
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -23,11 +24,12 @@ export const CreatePackDialog: React.FC<CreatePackDialogProps> = ({ open, onOpen
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Aquí iría la lógica para crear la manada
-    console.log('Creating pack:', { ...formData, type: packType });
+    console.log('Creating pack:', { ...formData, type: packType, petType });
     onOpenChange(false);
     // Reset form
     setFormData({ name: '', description: '' });
     setPackType('family');
+    setPetType('any');
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -127,6 +129,47 @@ export const CreatePackDialog: React.FC<CreatePackDialogProps> = ({ open, onOpen
                   </div>
                 );
               })}
+            </RadioGroup>
+          </div>
+
+          {/* Pet Type Selection */}
+          <div className="space-y-4">
+            <Label className="text-base font-medium">Tipo de Mascota *</Label>
+            <RadioGroup 
+              value={petType} 
+              onValueChange={(value) => setPetType(value as 'dog' | 'cat' | 'any')}
+              className="grid grid-cols-3 gap-3"
+            >
+              <div>
+                <RadioGroupItem value="dog" id="dog" className="peer sr-only" />
+                <Label
+                  htmlFor="dog"
+                  className="flex flex-col items-center justify-center p-4 rounded-lg border-2 border-pack-border cursor-pointer transition-all peer-data-[state=checked]:border-pack-primary peer-data-[state=checked]:bg-pack-primary/5"
+                >
+                  <span className="text-2xl mb-2">🐕</span>
+                  <span className="text-sm font-medium">Perros</span>
+                </Label>
+              </div>
+              <div>
+                <RadioGroupItem value="cat" id="cat" className="peer sr-only" />
+                <Label
+                  htmlFor="cat"
+                  className="flex flex-col items-center justify-center p-4 rounded-lg border-2 border-pack-border cursor-pointer transition-all peer-data-[state=checked]:border-pack-primary peer-data-[state=checked]:bg-pack-primary/5"
+                >
+                  <span className="text-2xl mb-2">🐈</span>
+                  <span className="text-sm font-medium">Gatos</span>
+                </Label>
+              </div>
+              <div>
+                <RadioGroupItem value="any" id="any" className="peer sr-only" />
+                <Label
+                  htmlFor="any"
+                  className="flex flex-col items-center justify-center p-4 rounded-lg border-2 border-pack-border cursor-pointer transition-all peer-data-[state=checked]:border-pack-primary peer-data-[state=checked]:bg-pack-primary/5"
+                >
+                  <span className="text-2xl mb-2">🐾</span>
+                  <span className="text-sm font-medium">Mixta</span>
+                </Label>
+              </div>
             </RadioGroup>
           </div>
 

@@ -9,20 +9,28 @@ import { CreatePackDialog } from '@/components/packs/CreatePackDialog';
 import { PackDetails } from '@/components/packs/PackDetails';
 
 // Mock data para demostración
+// Nota: Para testing, algunas fechas de cumpleaños están ajustadas a hoy
+const today = new Date();
+const todayString = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+// Convertir la fecha de hoy al formato de año anterior para simular cumpleaños
+const lastYearBirthday = `${today.getFullYear() - 1}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
 const mockPacks = [
   {
     id: 1,
     name: "Familia López",
     type: "family" as const,
+    petType: "any" as const,
     description: "Manada familiar para compartir el cuidado de nuestras mascotas",
     members: [
-      { id: 1, name: "María López", role: "owner" as const, avatar: "/placeholder.svg" },
-      { id: 2, name: "Carlos López", role: "member" as const, avatar: "/placeholder.svg" },
-      { id: 3, name: "Ana López", role: "member" as const, avatar: "/placeholder.svg" }
+      { id: 1, name: "María López", role: "owner" as const, avatar: "/placeholder.svg", birthDate: lastYearBirthday }, // Cumpleaños hoy!
+      { id: 2, name: "Carlos López", role: "member" as const, avatar: "/placeholder.svg", birthDate: "1982-11-03" },
+      { id: 3, name: "Ana López", role: "member" as const, avatar: "/placeholder.svg", birthDate: "2010-08-22" }
     ],
     pets: [
       { id: 1, name: "Max", type: "Perro", avatar: "/placeholder.svg", birthDate: "2022-03-15" },
-      { id: 2, name: "Luna", type: "Gato", avatar: "/placeholder.svg", birthDate: "2021-07-20" }
+      { id: 2, name: "Luna", type: "Gato", avatar: "/placeholder.svg", birthDate: lastYearBirthday } // Cumpleaños hoy!
     ],
     events: [],
     createdAt: "2024-01-15",
@@ -32,11 +40,12 @@ const mockPacks = [
     id: 2,
     name: "Amantes de los Golden",
     type: "open" as const,
+    petType: "dog" as const,
     description: "Comunidad para dueños de Golden Retrievers en Bogotá",
     members: [
-      { id: 1, name: "Pedro Martín", role: "owner" as const, avatar: "/placeholder.svg" },
-      { id: 4, name: "Sofia Chen", role: "member" as const, avatar: "/placeholder.svg" },
-      { id: 5, name: "Diego Ruiz", role: "member" as const, avatar: "/placeholder.svg" }
+      { id: 1, name: "Pedro Martín", role: "owner" as const, avatar: "/placeholder.svg", birthDate: "1990-02-18" },
+      { id: 4, name: "Sofia Chen", role: "member" as const, avatar: "/placeholder.svg", birthDate: "1995-06-30" },
+      { id: 5, name: "Diego Ruiz", role: "member" as const, avatar: "/placeholder.svg", birthDate: "1988-09-14" }
     ],
     pets: [
       { id: 3, name: "Buddy", type: "Perro", avatar: "/placeholder.svg", birthDate: "2020-12-10" },

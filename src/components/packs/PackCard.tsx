@@ -23,6 +23,7 @@ interface PackCardProps {
     id: number;
     name: string;
     type: 'family' | 'open';
+    petType: 'dog' | 'cat' | 'any';
     description: string;
     members: PackMember[];
     pets: PackPet[];
@@ -52,6 +53,14 @@ export const PackCard: React.FC<PackCardProps> = ({ pack, isSelected, onSelect }
   const config = packTypeConfig[pack.type];
   const IconComponent = config.icon;
 
+  const petTypeConfig = {
+    dog: { emoji: '🐕', label: 'Solo Perros' },
+    cat: { emoji: '🐈', label: 'Solo Gatos' },
+    any: { emoji: '🐾', label: 'Cualquier Mascota' }
+  };
+
+  const petConfig = petTypeConfig[pack.petType];
+
   return (
     <Card 
       className={`cursor-pointer transition-all duration-200 hover:shadow-lg bg-white/80 backdrop-blur-sm border-pack-border ${
@@ -74,10 +83,15 @@ export const PackCard: React.FC<PackCardProps> = ({ pack, isSelected, onSelect }
                   <Crown className="w-4 h-4 text-amber-500" />
                 )}
               </div>
-              <Badge variant="secondary" className={config.color}>
-                <IconComponent className="w-3 h-3 mr-1" />
-                {config.label}
-              </Badge>
+              <div className="flex items-center gap-2">
+                <Badge variant="secondary" className={config.color}>
+                  <IconComponent className="w-3 h-3 mr-1" />
+                  {config.label}
+                </Badge>
+                <Badge variant="outline" className="text-xs">
+                  {petConfig.emoji} {petConfig.label}
+                </Badge>
+              </div>
             </div>
           </div>
         </div>
