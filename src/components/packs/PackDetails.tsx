@@ -158,17 +158,26 @@ export const PackDetails: React.FC<PackDetailsProps> = ({ pack, onClose }) => {
       type: 'member' | 'pet';
     }> = [];
     
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const currentMonth = today.getMonth();
+    const currentDay = today.getDate();
+    
     // Cumpleaños de miembros
     pack.members.forEach(member => {
       if (member.birthDate) {
-        const currentYear = new Date().getFullYear();
         const birthDate = new Date(member.birthDate);
-        const nextBirthday = new Date(currentYear, birthDate.getMonth(), birthDate.getDate());
+        const birthMonth = birthDate.getMonth();
+        const birthDay = birthDate.getDate();
         
-        // Si ya pasó este año, usar el próximo año
-        if (nextBirthday < new Date()) {
-          nextBirthday.setFullYear(currentYear + 1);
+        let nextBirthdayYear = currentYear;
+        
+        // Si el cumpleaños ya pasó este año (comparando mes y día)
+        if (birthMonth < currentMonth || (birthMonth === currentMonth && birthDay < currentDay)) {
+          nextBirthdayYear = currentYear + 1;
         }
+        
+        const nextBirthday = new Date(nextBirthdayYear, birthMonth, birthDay);
         
         birthdays.push({
           id: `member-birthday-${member.id}`,
@@ -182,14 +191,18 @@ export const PackDetails: React.FC<PackDetailsProps> = ({ pack, onClose }) => {
     // Cumpleaños de mascotas
     pack.pets.forEach(pet => {
       if (pet.birthDate) {
-        const currentYear = new Date().getFullYear();
         const birthDate = new Date(pet.birthDate);
-        const nextBirthday = new Date(currentYear, birthDate.getMonth(), birthDate.getDate());
+        const birthMonth = birthDate.getMonth();
+        const birthDay = birthDate.getDate();
         
-        // Si ya pasó este año, usar el próximo año
-        if (nextBirthday < new Date()) {
-          nextBirthday.setFullYear(currentYear + 1);
+        let nextBirthdayYear = currentYear;
+        
+        // Si el cumpleaños ya pasó este año (comparando mes y día)
+        if (birthMonth < currentMonth || (birthMonth === currentMonth && birthDay < currentDay)) {
+          nextBirthdayYear = currentYear + 1;
         }
+        
+        const nextBirthday = new Date(nextBirthdayYear, birthMonth, birthDay);
         
         birthdays.push({
           id: `pet-birthday-${pet.id}`,
@@ -219,6 +232,11 @@ export const PackDetails: React.FC<PackDetailsProps> = ({ pack, onClose }) => {
   const todayBirthdays = getBirthdays().filter(birthday => 
     isToday(new Date(birthday.date))
   );
+
+  // Debug - ver qué cumpleaños hay
+  console.log('Todos los cumpleaños:', getBirthdays());
+  console.log('Cumpleaños de hoy:', todayBirthdays);
+  console.log('Fecha de hoy:', new Date().toISOString());
 
   return (
     <Card className="bg-white/80 backdrop-blur-sm border-pack-border sticky top-24">
