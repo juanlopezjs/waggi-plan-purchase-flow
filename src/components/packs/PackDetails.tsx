@@ -26,6 +26,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { EventCard } from './EventCard';
 import { CreateEventDialog } from './CreateEventDialog';
 import { SendGiftDialog } from './SendGiftDialog';
+import { EditPackDialog } from './EditPackDialog';
 import { format, isToday, isTomorrow } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -69,6 +70,7 @@ interface PackDetailsProps {
     events: PackEvent[];
     createdAt: string;
     isOwner: boolean;
+    allowedBreeds?: string[];
   };
   onClose: () => void;
 }
@@ -78,6 +80,7 @@ export const PackDetails: React.FC<PackDetailsProps> = ({ pack, onClose }) => {
   const [isInviting, setIsInviting] = useState(false);
   const [isCreateEventOpen, setIsCreateEventOpen] = useState(false);
   const [isGiftDialogOpen, setIsGiftDialogOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedBirthday, setSelectedBirthday] = useState<{ name: string; type: 'member' | 'pet' } | null>(null);
   const [events, setEvents] = useState<PackEvent[]>(pack.events);
 
@@ -228,15 +231,25 @@ export const PackDetails: React.FC<PackDetailsProps> = ({ pack, onClose }) => {
     new Date(`${event.date}T${event.time}`) >= new Date()
   ).slice(0, 2);
 
-  // Solo cumpleaños de HOY para mostrar en el resumen
-  const todayBirthdays = getBirthdays().filter(birthday => 
-    isToday(new Date(birthday.date))
-  );
+// Solo cumpleaños de HOY para mostrar en el resumen (evitar problemas de zona horaria)
+const isBirthdayToday = (dateStr?: string) => {
+  if (!dateStr) return false;
+  const parts = dateStr.split('-');
+  if (parts.length < 3) return false;
+  const month = Number(parts[1]);
+  const day = Number(parts[2]);
+  const now = new Date();
+  return month === now.getMonth() + 1 && day === now.getDate();
+};
 
-  // Debug - ver qué cumpleaños hay
-  console.log('Todos los cumpleaños:', getBirthdays());
-  console.log('Cumpleaños de hoy:', todayBirthdays);
-  console.log('Fecha de hoy:', new Date().toISOString());
+const todayBirthdays = [
+  ...pack.members
+    .filter((m) => isBirthdayToday(m.birthDate))
+    .map((m) => ({ id: `member-birthday-${m.id}`, name: m.name, type: 'member' as const })),
+  ...pack.pets
+    .filter((p) => isBirthdayToday(p.birthDate))
+    .map((p) => ({ id: `pet-birthday-${p.id}`, name: p.name, type: 'pet' as const })),
+];
 
   return (
     <Card className="bg-white/80 backdrop-blur-sm border-pack-border sticky top-24">
@@ -272,10 +285,10 @@ export const PackDetails: React.FC<PackDetailsProps> = ({ pack, onClose }) => {
                     <Share2 className="w-4 h-4 mr-2" />
                     Compartir
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Settings className="w-4 h-4 mr-2" />
-                    Configurar
-                  </DropdownMenuItem>
+<DropdownMenuItem onClick={() => setIsEditOpen(true)}>
+  <Settings className="w-4 h-4 mr-2" />
+  Configurar
+</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
@@ -330,31 +343,38 @@ export const PackDetails: React.FC<PackDetailsProps> = ({ pack, onClose }) => {
                 );
               })}
               
-              {/* Mostrar cumpleaños de HOY en amarillo */}
-              {todayBirthdays.map((birthday) => (
-                <div 
-                  key={birthday.id} 
-                  className="flex items-center gap-3 p-2 bg-yellow-100 border border-yellow-300 rounded-lg"
-                >
-                  <Cake className="w-4 h-4 text-yellow-600" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-yellow-900 truncate">
-                      🎉 ¡Cumpleaños de {birthday.name}!
-                    </p>
-                    <p className="text-xs text-yellow-700">
-                      Hoy • {birthday.type === 'member' ? 'Miembro' : 'Mascota'}
-                    </p>
-                  </div>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="text-yellow-600 hover:text-yellow-700 hover:bg-yellow-200"
-                    onClick={() => handleSendGift(birthday.name, birthday.type)}
-                  >
-                    <Gift className="w-4 h-4" />
-                  </Button>
-                </div>
-              ))}
+{/* Mostrar cumpleaños de HOY en amarillo */}
+{todayBirthdays.length === 0 ? (
+  <div className="flex items-center gap-3 p-2 bg-pack-muted/30 rounded-lg">
+    <Cake className="w-4 h-4 text-pack-muted-foreground" />
+    <p className="text-xs text-pack-muted-foreground">No hay cumpleaños hoy</p>
+  </div>
+) : (
+  todayBirthdays.map((birthday) => (
+    <div 
+      key={birthday.id} 
+      className="flex items-center gap-3 p-2 bg-yellow-100 border border-yellow-300 rounded-lg"
+    >
+      <Cake className="w-4 h-4 text-yellow-600" />
+      <div className="flex-1 min-w-0">
+        <p className="text-xs font-medium text-yellow-900 truncate">
+          🎉 ¡Cumpleaños de {birthday.name}!
+        </p>
+        <p className="text-xs text-yellow-700">
+          Hoy • {birthday.type === 'member' ? 'Miembro' : 'Mascota'}
+        </p>
+      </div>
+      <Button
+        size="sm"
+        variant="ghost"
+        className="text-yellow-600 hover:text-yellow-700 hover:bg-yellow-200"
+        onClick={() => handleSendGift(birthday.name, birthday.type)}
+      >
+        <Gift className="w-4 h-4" />
+      </Button>
+    </div>
+  ))
+)}
             </div>
           </div>
         )}
@@ -512,6 +532,20 @@ export const PackDetails: React.FC<PackDetailsProps> = ({ pack, onClose }) => {
         open={isCreateEventOpen}
         onOpenChange={setIsCreateEventOpen}
         onCreateEvent={handleCreateEvent}
+      />
+
+      {/* Dialog para editar pack */}
+      <EditPackDialog
+        open={isEditOpen}
+        onOpenChange={setIsEditOpen}
+        pack={{
+          id: pack.id,
+          name: pack.name,
+          type: pack.type,
+          petType: pack.petType,
+          description: pack.description,
+          allowedBreeds: pack.allowedBreeds || [],
+        }}
       />
 
       {/* Dialog para enviar regalo */}

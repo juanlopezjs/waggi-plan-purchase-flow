@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,8 +6,9 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Card, CardContent } from '@/components/ui/card';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Users, Heart, Globe, Info } from 'lucide-react';
-
 interface CreatePackDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -16,21 +17,34 @@ interface CreatePackDialogProps {
 export const CreatePackDialog: React.FC<CreatePackDialogProps> = ({ open, onOpenChange }) => {
   const [packType, setPackType] = useState<'family' | 'open'>('family');
   const [petType, setPetType] = useState<'dog' | 'cat' | 'any'>('any');
+
+  // Opcional: razas permitidas según tipo de mascota
+  const dogBreeds = ['Golden Retriever', 'Labrador', 'Bulldog', 'Poodle', 'Beagle'];
+  const catBreeds = ['Persa', 'Siamés', 'Maine Coon', 'Bengala', 'Sphynx'];
+  const [allowedBreeds, setAllowedBreeds] = useState<string[]>([]);
+  const breeds = petType === 'dog' ? dogBreeds : catBreeds;
+  useEffect(() => { setAllowedBreeds([]); }, [petType]);
+  const toggleBreed = (breed: string) => {
+    setAllowedBreeds((prev) => prev.includes(breed) ? prev.filter(b => b !== breed) : [...prev, breed]);
+  };
+
   const [formData, setFormData] = useState({
     name: '',
     description: '',
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Aquí iría la lógica para crear la manada
-    console.log('Creating pack:', { ...formData, type: packType, petType });
-    onOpenChange(false);
-    // Reset form
-    setFormData({ name: '', description: '' });
-    setPackType('family');
-    setPetType('any');
-  };
+const handleSubmit = (e: React.FormEvent) => {
+  e.preventDefault();
+  // Aquí iría la lógica para crear la manada
+  const payload = { ...formData, type: packType, petType, allowedBreeds: petType === 'any' ? [] : allowedBreeds };
+  console.log('Creating pack:', payload);
+  onOpenChange(false);
+  // Reset form
+  setFormData({ name: '', description: '' });
+  setPackType('family');
+  setPetType('any');
+  setAllowedBreeds([]);
+};
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -173,8 +187,35 @@ export const CreatePackDialog: React.FC<CreatePackDialogProps> = ({ open, onOpen
             </RadioGroup>
           </div>
 
-          {/* Basic Information */}
-          <div className="space-y-4">
+{/* Razas permitidas (opcional) */}
+{petType !== 'any' && (
+  <div className="space-y-3">
+    <div className="flex items-center justify-between">
+      <Label className="text-base font-medium">Razas permitidas (opcional)</Label>
+      <span className="text-xs text-pack-muted-foreground">{allowedBreeds.length} seleccionadas</span>
+    </div>
+    <ScrollArea className="h-36 rounded-md border border-pack-border p-3 bg-pack-muted/30">
+      <div className="grid grid-cols-2 gap-2">
+        {breeds.map((breed) => (
+          <label key={breed} className="flex items-center gap-2 text-sm text-pack-foreground">
+            <Checkbox 
+              checked={allowedBreeds.includes(breed)}
+              onCheckedChange={() => toggleBreed(breed)}
+              id={`create-breed-${breed}`}
+            />
+            <span>{breed}</span>
+          </label>
+        ))}
+      </div>
+    </ScrollArea>
+    <p className="text-xs text-pack-muted-foreground">
+      Si no seleccionas ninguna, se permitirán todas las razas de {petType === 'dog' ? 'perros' : 'gatos'}.
+    </p>
+  </div>
+)}
+
+{/* Basic Information */}
+<div className="space-y-4">
             <div>
               <Label htmlFor="name">Nombre de la Manada *</Label>
               <Input 
