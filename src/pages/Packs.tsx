@@ -21,6 +21,7 @@ const mockPacks = [
     type: "family" as const,
     petType: "any" as const,
     description: "Manada familiar para compartir el cuidado de nuestras mascotas",
+    allowedBreeds: [],
     members: [
       { id: 1, name: "María López", role: "owner" as const, avatar: "/placeholder.svg", birthDate: `1985-${currentMonth}-${currentDay}` }, // Cumpleaños HOY!
       { id: 2, name: "Carlos López", role: "member" as const, avatar: "/placeholder.svg", birthDate: "1982-11-03" },
@@ -40,6 +41,7 @@ const mockPacks = [
     type: "open" as const,
     petType: "dog" as const,
     description: "Comunidad para dueños de Golden Retrievers en Bogotá",
+    allowedBreeds: ["Golden Retriever", "Labrador"],
     members: [
       { id: 1, name: "Pedro Martín", role: "owner" as const, avatar: "/placeholder.svg", birthDate: "1990-02-18" },
       { id: 4, name: "Sofia Chen", role: "member" as const, avatar: "/placeholder.svg", birthDate: "1995-06-30" },

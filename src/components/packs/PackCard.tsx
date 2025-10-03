@@ -29,6 +29,7 @@ interface PackCardProps {
     pets: PackPet[];
     createdAt: string;
     isOwner: boolean;
+    allowedBreeds?: string[];
   };
   isSelected: boolean;
   onSelect: () => void;
@@ -102,6 +103,25 @@ export const PackCard: React.FC<PackCardProps> = ({ pack, isSelected, onSelect }
         <p className="text-sm text-pack-muted-foreground line-clamp-2">
           {pack.description}
         </p>
+
+        {/* Allowed Breeds */}
+        {pack.allowedBreeds && pack.allowedBreeds.length > 0 && (
+          <div className="pt-2 border-t border-pack-border">
+            <p className="text-xs font-medium text-pack-muted-foreground mb-1">Razas permitidas:</p>
+            <div className="flex flex-wrap gap-1">
+              {pack.allowedBreeds.slice(0, 3).map((breed) => (
+                <Badge key={breed} variant="outline" className="text-xs">
+                  {breed}
+                </Badge>
+              ))}
+              {pack.allowedBreeds.length > 3 && (
+                <Badge variant="outline" className="text-xs">
+                  +{pack.allowedBreeds.length - 3}
+                </Badge>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Quick Stats */}
         <div className="grid grid-cols-2 gap-3">

@@ -307,6 +307,20 @@ const todayBirthdays = [
           </p>
         )}
 
+        {/* Allowed Breeds */}
+        {pack.allowedBreeds && pack.allowedBreeds.length > 0 && (
+          <div className="p-3 bg-pack-muted/30 rounded-lg">
+            <p className="text-xs font-medium text-pack-foreground mb-2">Razas permitidas:</p>
+            <div className="flex flex-wrap gap-1">
+              {pack.allowedBreeds.map((breed) => (
+                <Badge key={breed} variant="outline" className="text-xs">
+                  {breed}
+                </Badge>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Próximos eventos y cumpleaños de hoy */}
         {(upcomingEvents.length > 0 || todayBirthdays.length > 0) && (
           <div className="space-y-3">
