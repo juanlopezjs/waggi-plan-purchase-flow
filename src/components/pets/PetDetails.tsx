@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Calendar, Scale, Ruler, Edit, Heart, Award, Activity, Play, RefreshCw, CheckCircle2, BookOpen, Clock } from 'lucide-react';
+import { Calendar, Scale, Ruler, Edit, Heart, Play, CheckCircle2, BookOpen } from 'lucide-react';
 
 // Mock data for courses - in production this would come from an API
 const mockCourses = [
@@ -22,10 +22,9 @@ const mockCourses = [
     id: 2,
     title: "Socialización Canina",
     description: "Aprende a socializar con otras mascotas",
-    status: "in-progress" as const,
+    status: "available" as const,
     duration: "3 semanas",
-    level: "Intermedio",
-    progress: 60
+    level: "Intermedio"
   },
   {
     id: 3,
@@ -74,7 +73,6 @@ interface PetDetailsProps {
 
 export const PetDetails: React.FC<PetDetailsProps> = ({ pet }) => {
   const availableCourses = mockCourses.filter(c => c.status === 'available');
-  const inProgressCourses = mockCourses.filter(c => c.status === 'in-progress');
   const completedCourses = mockCourses.filter(c => c.status === 'completed');
   
   return (
@@ -158,14 +156,10 @@ export const PetDetails: React.FC<PetDetailsProps> = ({ pet }) => {
 
           <TabsContent value="evaluations" className="space-y-4">
             {/* Stats Summary */}
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 gap-3">
               <div className="p-3 bg-blue-500/10 rounded-lg text-center">
                 <div className="text-2xl font-bold text-blue-600">{availableCourses.length}</div>
                 <div className="text-xs text-muted-foreground">Disponibles</div>
-              </div>
-              <div className="p-3 bg-amber-500/10 rounded-lg text-center">
-                <div className="text-2xl font-bold text-amber-600">{inProgressCourses.length}</div>
-                <div className="text-xs text-muted-foreground">En Curso</div>
               </div>
               <div className="p-3 bg-green-500/10 rounded-lg text-center">
                 <div className="text-2xl font-bold text-green-600">{completedCourses.length}</div>
@@ -175,52 +169,6 @@ export const PetDetails: React.FC<PetDetailsProps> = ({ pet }) => {
 
             <ScrollArea className="h-[400px] pr-4">
               <div className="space-y-6">
-                {/* In Progress Courses */}
-                {inProgressCourses.length > 0 && (
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2">
-                      <Clock className="w-4 h-4 text-amber-600" />
-                      <h4 className="font-semibold text-sm">En Curso</h4>
-                    </div>
-                    {inProgressCourses.map((course) => (
-                      <Card key={course.id} className="border-amber-200 bg-amber-50/50 dark:bg-amber-950/20">
-                        <CardContent className="p-4">
-                          <div className="flex items-start justify-between gap-3 mb-3">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-1">
-                                <h5 className="font-semibold text-sm">{course.title}</h5>
-                                <Badge variant="secondary" className="text-xs bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-200">
-                                  {course.level}
-                                </Badge>
-                              </div>
-                              <p className="text-xs text-muted-foreground mb-2">{course.description}</p>
-                              <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                                <span className="flex items-center gap-1">
-                                  <Calendar className="w-3 h-3" />
-                                  {course.duration}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                          {course.progress && (
-                            <div className="mb-3">
-                              <div className="flex items-center justify-between mb-1">
-                                <span className="text-xs text-muted-foreground">Progreso</span>
-                                <span className="text-xs font-medium">{course.progress}%</span>
-                              </div>
-                              <Progress value={course.progress} className="h-2" />
-                            </div>
-                          )}
-                          <Button size="sm" className="w-full bg-amber-600 hover:bg-amber-700 text-white">
-                            <RefreshCw className="w-3 h-3 mr-2" />
-                            Actualizar Progreso
-                          </Button>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                )}
-
                 {/* Available Courses */}
                 {availableCourses.length > 0 && (
                   <div className="space-y-3">
