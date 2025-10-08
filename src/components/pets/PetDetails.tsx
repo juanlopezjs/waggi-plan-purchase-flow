@@ -4,7 +4,56 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Calendar, Scale, Ruler, Edit, Heart, Award, Activity } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Calendar, Scale, Ruler, Edit, Heart, Award, Activity, Play, RefreshCw, CheckCircle2, BookOpen, Clock } from 'lucide-react';
+
+// Mock data for courses - in production this would come from an API
+const mockCourses = [
+  {
+    id: 1,
+    title: "Obediencia Básica",
+    description: "Comandos fundamentales para tu mascota",
+    status: "available" as const,
+    duration: "4 semanas",
+    level: "Básico"
+  },
+  {
+    id: 2,
+    title: "Socialización Canina",
+    description: "Aprende a socializar con otras mascotas",
+    status: "in-progress" as const,
+    duration: "3 semanas",
+    level: "Intermedio",
+    progress: 60
+  },
+  {
+    id: 3,
+    title: "Comportamiento Avanzado",
+    description: "Técnicas avanzadas de comportamiento",
+    status: "available" as const,
+    duration: "6 semanas",
+    level: "Avanzado"
+  },
+  {
+    id: 4,
+    title: "Trucos y Habilidades",
+    description: "Enseña trucos divertidos a tu mascota",
+    status: "completed" as const,
+    duration: "2 semanas",
+    level: "Básico",
+    completedDate: "2024-01-15"
+  },
+  {
+    id: 5,
+    title: "Agilidad y Ejercicio",
+    description: "Entrenamiento físico y mental",
+    status: "completed" as const,
+    duration: "5 semanas",
+    level: "Intermedio",
+    completedDate: "2023-12-20"
+  }
+];
 
 interface PetDetailsProps {
   pet: {
@@ -24,6 +73,10 @@ interface PetDetailsProps {
 }
 
 export const PetDetails: React.FC<PetDetailsProps> = ({ pet }) => {
+  const availableCourses = mockCourses.filter(c => c.status === 'available');
+  const inProgressCourses = mockCourses.filter(c => c.status === 'in-progress');
+  const completedCourses = mockCourses.filter(c => c.status === 'completed');
+  
   return (
     <Card>
       <CardHeader>
@@ -104,37 +157,142 @@ export const PetDetails: React.FC<PetDetailsProps> = ({ pet }) => {
           </TabsContent>
 
           <TabsContent value="evaluations" className="space-y-4">
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h4 className="font-medium">Evaluaciones disponibles</h4>
-                  <p className="text-sm text-muted-foreground">
-                    {pet.evaluationsAvailable - pet.evaluationsUsed} de {pet.evaluationsAvailable} restantes
-                  </p>
-                </div>
-                <Badge 
-                  variant={pet.evaluationsAvailable - pet.evaluationsUsed > 2 ? "default" : "destructive"}
-                  className="flex items-center gap-1"
-                >
-                  <Award className="w-3 h-3" />
-                  {pet.evaluationsAvailable - pet.evaluationsUsed}
-                </Badge>
+            {/* Stats Summary */}
+            <div className="grid grid-cols-3 gap-3">
+              <div className="p-3 bg-blue-500/10 rounded-lg text-center">
+                <div className="text-2xl font-bold text-blue-600">{availableCourses.length}</div>
+                <div className="text-xs text-muted-foreground">Disponibles</div>
               </div>
-              
-              <div className="w-full bg-muted rounded-full h-3">
-                <div 
-                  className="h-3 bg-pet-primary rounded-full transition-all"
-                  style={{ 
-                    width: `${((pet.evaluationsAvailable - pet.evaluationsUsed) / pet.evaluationsAvailable) * 100}%` 
-                  }}
-                />
+              <div className="p-3 bg-amber-500/10 rounded-lg text-center">
+                <div className="text-2xl font-bold text-amber-600">{inProgressCourses.length}</div>
+                <div className="text-xs text-muted-foreground">En Curso</div>
               </div>
-
-              <Button className="w-full bg-pet-primary hover:bg-pet-primary/90">
-                <Activity className="w-4 h-4 mr-2" />
-                Nueva Evaluación
-              </Button>
+              <div className="p-3 bg-green-500/10 rounded-lg text-center">
+                <div className="text-2xl font-bold text-green-600">{completedCourses.length}</div>
+                <div className="text-xs text-muted-foreground">Completados</div>
+              </div>
             </div>
+
+            <ScrollArea className="h-[400px] pr-4">
+              <div className="space-y-6">
+                {/* In Progress Courses */}
+                {inProgressCourses.length > 0 && (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-amber-600" />
+                      <h4 className="font-semibold text-sm">En Curso</h4>
+                    </div>
+                    {inProgressCourses.map((course) => (
+                      <Card key={course.id} className="border-amber-200 bg-amber-50/50 dark:bg-amber-950/20">
+                        <CardContent className="p-4">
+                          <div className="flex items-start justify-between gap-3 mb-3">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <h5 className="font-semibold text-sm">{course.title}</h5>
+                                <Badge variant="secondary" className="text-xs bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-200">
+                                  {course.level}
+                                </Badge>
+                              </div>
+                              <p className="text-xs text-muted-foreground mb-2">{course.description}</p>
+                              <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                                <span className="flex items-center gap-1">
+                                  <Calendar className="w-3 h-3" />
+                                  {course.duration}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          {course.progress && (
+                            <div className="mb-3">
+                              <div className="flex items-center justify-between mb-1">
+                                <span className="text-xs text-muted-foreground">Progreso</span>
+                                <span className="text-xs font-medium">{course.progress}%</span>
+                              </div>
+                              <Progress value={course.progress} className="h-2" />
+                            </div>
+                          )}
+                          <Button size="sm" className="w-full bg-amber-600 hover:bg-amber-700 text-white">
+                            <RefreshCw className="w-3 h-3 mr-2" />
+                            Actualizar Progreso
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+
+                {/* Available Courses */}
+                {availableCourses.length > 0 && (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <BookOpen className="w-4 h-4 text-blue-600" />
+                      <h4 className="font-semibold text-sm">Cursos Disponibles</h4>
+                    </div>
+                    {availableCourses.map((course) => (
+                      <Card key={course.id} className="border-blue-200 bg-blue-50/50 dark:bg-blue-950/20 hover:shadow-md transition-shadow">
+                        <CardContent className="p-4">
+                          <div className="flex items-start justify-between gap-3 mb-3">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <h5 className="font-semibold text-sm">{course.title}</h5>
+                                <Badge variant="outline" className="text-xs">
+                                  {course.level}
+                                </Badge>
+                              </div>
+                              <p className="text-xs text-muted-foreground mb-2">{course.description}</p>
+                              <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                                <span className="flex items-center gap-1">
+                                  <Calendar className="w-3 h-3" />
+                                  {course.duration}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <Button size="sm" className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+                            <Play className="w-3 h-3 mr-2" />
+                            Presentar Evaluación
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+
+                {/* Completed Courses */}
+                {completedCourses.length > 0 && (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-green-600" />
+                      <h4 className="font-semibold text-sm">Completados</h4>
+                    </div>
+                    {completedCourses.map((course) => (
+                      <Card key={course.id} className="border-green-200 bg-green-50/50 dark:bg-green-950/20">
+                        <CardContent className="p-4">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <CheckCircle2 className="w-4 h-4 text-green-600" />
+                                <h5 className="font-semibold text-sm">{course.title}</h5>
+                                <Badge variant="secondary" className="text-xs bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200">
+                                  Completado
+                                </Badge>
+                              </div>
+                              <p className="text-xs text-muted-foreground mb-2">{course.description}</p>
+                              <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                                <span className="flex items-center gap-1">
+                                  <Calendar className="w-3 h-3" />
+                                  Completado el {new Date(course.completedDate!).toLocaleDateString('es-ES')}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </ScrollArea>
           </TabsContent>
         </Tabs>
       </CardContent>
