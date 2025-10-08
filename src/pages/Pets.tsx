@@ -102,10 +102,10 @@ const Pets = () => {
       </header>
 
       <div className="container mx-auto px-4 py-8">
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid lg:grid-cols-3 gap-10 lg:gap-12">
           {/* Pets Grid */}
           <div className="lg:col-span-2">
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid md:grid-cols-2 gap-6 mb-6 lg:mb-0">
               {pets.map((pet) => (
                 <PetCard
                   key={pet.id}
