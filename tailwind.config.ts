@@ -82,6 +82,14 @@ export default {
 					muted: 'hsl(var(--pack-muted))',
 					'muted-foreground': 'hsl(var(--pack-muted-foreground))',
 					border: 'hsl(var(--pack-border))'
+				},
+				vaccination: {
+					primary: 'hsl(var(--vaccination-primary))',
+					'primary-foreground': 'hsl(var(--vaccination-primary-foreground))',
+					secondary: 'hsl(var(--vaccination-secondary))',
+					'secondary-foreground': 'hsl(var(--vaccination-secondary-foreground))',
+					accent: 'hsl(var(--vaccination-accent))',
+					'accent-foreground': 'hsl(var(--vaccination-accent-foreground))'
 				}
 			},
 			borderRadius: {

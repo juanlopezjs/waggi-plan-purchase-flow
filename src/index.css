@@ -72,6 +72,14 @@
     --pack-muted: 220 15% 95%;
     --pack-muted-foreground: 220 10% 40%;
     --pack-border: 220 15% 90%;
+
+    /* Vaccination-specific colors */
+    --vaccination-primary: 160 84% 39%;
+    --vaccination-primary-foreground: 0 0% 100%;
+    --vaccination-secondary: 280 100% 70%;
+    --vaccination-secondary-foreground: 0 0% 100%;
+    --vaccination-accent: 160 20% 95%;
+    --vaccination-accent-foreground: 160 20% 15%;
   }
 
   .dark {
@@ -131,6 +139,14 @@
     --pack-muted: 220 15% 15%;
     --pack-muted-foreground: 220 10% 60%;
     --pack-border: 220 15% 20%;
+
+    /* Vaccination-specific dark colors */
+    --vaccination-primary: 160 70% 45%;
+    --vaccination-primary-foreground: 0 0% 100%;
+    --vaccination-secondary: 280 80% 65%;
+    --vaccination-secondary-foreground: 0 0% 5%;
+    --vaccination-accent: 160 30% 15%;
+    --vaccination-accent-foreground: 160 30% 85%;
   }
 }
 
