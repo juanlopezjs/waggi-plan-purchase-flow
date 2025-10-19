@@ -10,6 +10,7 @@ import Chat from "./pages/Chat";
 import Pets from "./pages/Pets";
 import Packs from "./pages/Packs";
 import Vaccinations from "./pages/Vaccinations";
+import EmailPreview from "./pages/EmailPreview";
 import Success from "./pages/Success";
 import Error from "./pages/Error";
 import NotFound from "./pages/NotFound";
@@ -29,6 +30,7 @@ const App = () => (
           <Route path="/pets" element={<Pets />} />
           <Route path="/packs" element={<Packs />} />
           <Route path="/pets/vaccinations" element={<Vaccinations />} />
+          <Route path="/email-preview" element={<EmailPreview />} />
           <Route path="/success" element={<Success />} />
           <Route path="/error" element={<Error />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
