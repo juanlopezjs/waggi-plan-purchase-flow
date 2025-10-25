@@ -79,7 +79,14 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onDelete }) => {
               {event.location && (
                 <div className="flex items-center gap-2 text-xs text-pack-muted-foreground">
                   <MapPin className="w-3 h-3" />
-                  <span>{event.location}</span>
+                  <a 
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-pack-primary hover:underline transition-colors"
+                  >
+                    {event.location}
+                  </a>
                 </div>
               )}
               
