@@ -31,7 +31,30 @@ const mockPacks = [
       { id: 1, name: "Max", type: "Perro", avatar: "/placeholder.svg", birthDate: "2022-03-15" },
       { id: 2, name: "Luna", type: "Gato", avatar: "/placeholder.svg", birthDate: `2021-${currentMonth}-${currentDay}` } // Cumpleaños HOY!
     ],
-    events: [],
+    events: [
+      {
+        id: 'fam-1',
+        title: "Visita al veterinario",
+        description: "Chequeo anual para Max",
+        date: "2025-11-05",
+        time: "10:30",
+        location: "Clínica Veterinaria San Francisco, Calle 45 #12-34",
+        attendees: 2,
+        createdBy: "María López",
+        canDelete: true
+      },
+      {
+        id: 'fam-2',
+        title: "Sesión de peluquería",
+        description: "Corte y baño para Luna",
+        date: "2025-11-10",
+        time: "15:00",
+        location: "Pet Spa Bogotá, Carrera 7 #85-23",
+        attendees: 1,
+        createdBy: "Carlos López",
+        canDelete: true
+      }
+    ],
     createdAt: "2024-01-15",
     isOwner: true
   },
@@ -57,11 +80,32 @@ const mockPacks = [
         id: 1,
         title: "Paseo grupal en el parque",
         description: "Encuentro semanal en el Parque Central para socializar nuestros Golden Retrievers",
-        date: "2024-01-30",
+        date: "2025-11-02",
         time: "16:00",
-        location: "Parque Central - Entrada principal",
-        type: "event" as const,
+        location: "Parque El Virrey, Bogotá",
         attendees: 5,
+        createdBy: "Pedro Martín",
+        canDelete: false
+      },
+      {
+        id: 2,
+        title: "Entrenamiento de obediencia",
+        description: "Clase grupal de entrenamiento básico",
+        date: "2025-11-08",
+        time: "09:00",
+        location: "Parque Simón Bolívar, Zona Deportiva",
+        attendees: 8,
+        createdBy: "Sofia Chen",
+        canDelete: false
+      },
+      {
+        id: 3,
+        title: "Cumpleaños de Buddy",
+        description: "Celebración del cumpleaños de Buddy con todos los amigos peludos",
+        date: "2025-12-10",
+        time: "14:00",
+        location: "Cafetería Pet Friendly La Estación, Calle 85",
+        attendees: 12,
         createdBy: "Pedro Martín",
         canDelete: false
       }
