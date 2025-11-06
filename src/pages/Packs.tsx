@@ -132,52 +132,56 @@ const Packs = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pack-background to-pack-secondary">
-      {/* Header */}
-      <header className="border-b border-pack-border bg-white/80 backdrop-blur-sm sticky top-0 z-40">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+      {/* Header - Mobile optimized */}
+      <header className="border-b border-pack-border bg-white/90 backdrop-blur-md sticky top-0 z-40 shadow-sm">
+        <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
               <Button 
                 variant="ghost" 
                 size="sm"
                 onClick={handleGoBack}
-                className="text-pack-muted-foreground hover:text-pack-foreground"
+                className="text-pack-muted-foreground hover:text-pack-foreground shrink-0"
               >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Volver
+                <ArrowLeft className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">Volver</span>
               </Button>
-              <div className="flex items-center gap-2">
-                <Users className="w-6 h-6 text-pack-primary" />
-                <h1 className="text-2xl font-bold text-pack-foreground">Mis Manadas</h1>
+              <div className="flex items-center gap-2 min-w-0">
+                <Users className="w-5 h-5 sm:w-6 sm:h-6 text-pack-primary shrink-0" />
+                <h1 className="text-lg sm:text-2xl font-bold text-pack-foreground truncate">Mis Manadas</h1>
               </div>
             </div>
             
             <Button 
               onClick={() => setIsCreateDialogOpen(true)}
-              className="bg-pack-primary hover:bg-pack-primary/90 text-pack-primary-foreground"
+              size="sm"
+              className="bg-pack-primary hover:bg-pack-primary/90 text-pack-primary-foreground shrink-0"
             >
-              <Plus className="w-4 h-4 mr-2" />
-              Crear Manada
+              <Plus className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Crear</span>
             </Button>
           </div>
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Lista de Manadas */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Estadísticas rápidas */}
-            <div className="grid sm:grid-cols-2 gap-4 mb-6">
-              <Card className="bg-white/80 backdrop-blur-sm border-pack-border">
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-pack-primary/10 rounded-lg flex items-center justify-center">
-                      <Heart className="w-5 h-5 text-pack-primary" />
+      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8">
+        {/* Mobile: Stack layout, Desktop: 2/3 + 1/3 grid */}
+        <div className="flex flex-col lg:grid lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+          
+          {/* Lista de Manadas - Full width on mobile */}
+          <div className="w-full lg:col-span-2 space-y-4 sm:space-y-6">
+            
+            {/* Estadísticas rápidas - Horizontal scroll on small screens */}
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
+              <Card className="bg-white/90 backdrop-blur-md border-pack-border shadow-sm hover:shadow-md transition-shadow">
+                <CardContent className="p-3 sm:p-4">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-pack-primary/10 rounded-xl flex items-center justify-center shrink-0">
+                      <Heart className="w-5 h-5 sm:w-6 sm:h-6 text-pack-primary" />
                     </div>
-                    <div>
-                      <p className="text-sm text-pack-muted-foreground">Manadas Familiares</p>
-                      <p className="text-2xl font-bold text-pack-foreground">
+                    <div className="min-w-0">
+                      <p className="text-xs sm:text-sm text-pack-muted-foreground truncate">Familiares</p>
+                      <p className="text-xl sm:text-2xl font-bold text-pack-foreground">
                         {mockPacks.filter(p => p.type === 'family').length}
                       </p>
                     </div>
@@ -185,15 +189,15 @@ const Packs = () => {
                 </CardContent>
               </Card>
               
-              <Card className="bg-white/80 backdrop-blur-sm border-pack-border">
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-pack-accent/10 rounded-lg flex items-center justify-center">
-                      <Globe className="w-5 h-5 text-pack-accent" />
+              <Card className="bg-white/90 backdrop-blur-md border-pack-border shadow-sm hover:shadow-md transition-shadow">
+                <CardContent className="p-3 sm:p-4">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-pack-accent/10 rounded-xl flex items-center justify-center shrink-0">
+                      <Globe className="w-5 h-5 sm:w-6 sm:h-6 text-pack-accent" />
                     </div>
-                    <div>
-                      <p className="text-sm text-pack-muted-foreground">Manadas Abiertas</p>
-                      <p className="text-2xl font-bold text-pack-foreground">
+                    <div className="min-w-0">
+                      <p className="text-xs sm:text-sm text-pack-muted-foreground truncate">Abiertas</p>
+                      <p className="text-xl sm:text-2xl font-bold text-pack-foreground">
                         {mockPacks.filter(p => p.type === 'open').length}
                       </p>
                     </div>
@@ -202,16 +206,16 @@ const Packs = () => {
               </Card>
             </div>
 
-            {/* Lista de manadas */}
-            <div className="space-y-4">
+            {/* Lista de manadas - Optimized spacing */}
+            <div className="space-y-3 sm:space-y-4">
               {mockPacks.length === 0 ? (
-                <Card className="bg-white/80 backdrop-blur-sm border-pack-border">
-                  <CardContent className="p-8 text-center">
-                    <Users className="w-16 h-16 text-pack-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-pack-foreground mb-2">
+                <Card className="bg-white/90 backdrop-blur-md border-pack-border shadow-sm">
+                  <CardContent className="p-6 sm:p-8 text-center">
+                    <Users className="w-12 h-12 sm:w-16 sm:h-16 text-pack-muted-foreground mx-auto mb-3 sm:mb-4" />
+                    <h3 className="text-base sm:text-lg font-semibold text-pack-foreground mb-2">
                       No tienes manadas aún
                     </h3>
-                    <p className="text-pack-muted-foreground mb-4">
+                    <p className="text-sm text-pack-muted-foreground mb-4 max-w-sm mx-auto">
                       Crea tu primera manada para comenzar a compartir el cuidado de tus mascotas
                     </p>
                     <Button 
@@ -236,27 +240,29 @@ const Packs = () => {
             </div>
           </div>
 
-          {/* Panel de detalles */}
-          <div className="lg:col-span-1">
-            {selectedPackData ? (
+          {/* Panel de detalles - Hidden on mobile when nothing selected, sticky on desktop */}
+          {selectedPackData ? (
+            <div className="w-full lg:col-span-1 lg:sticky lg:top-24 lg:h-fit">
               <PackDetails 
                 pack={selectedPackData}
                 onClose={() => setSelectedPack(null)}
               />
-            ) : (
-              <Card className="bg-white/80 backdrop-blur-sm border-pack-border sticky top-24">
+            </div>
+          ) : (
+            <div className="hidden lg:block lg:col-span-1">
+              <Card className="bg-white/90 backdrop-blur-md border-pack-border shadow-sm sticky top-24">
                 <CardContent className="p-8 text-center">
-                  <Users className="w-16 h-16 text-pack-muted-foreground mx-auto mb-4" />
+                  <Users className="w-16 h-16 text-pack-muted-foreground mx-auto mb-4 opacity-50" />
                   <h3 className="text-lg font-semibold text-pack-foreground mb-2">
                     Selecciona una manada
                   </h3>
-                  <p className="text-pack-muted-foreground">
+                  <p className="text-sm text-pack-muted-foreground">
                     Haz clic en una manada para ver sus detalles, miembros y mascotas
                   </p>
                 </CardContent>
               </Card>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
 

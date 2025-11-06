@@ -252,17 +252,17 @@ const todayBirthdays = [
 ];
 
   return (
-    <Card className="bg-white/80 backdrop-blur-sm border-pack-border sticky top-24">
-      <CardHeader className="pb-4">
-        <div className="flex items-start justify-between">
-          <div className="flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${config.color.split(' ')[0]}`}>
-              <IconComponent className={`w-5 h-5 ${config.iconColor}`} />
+    <Card className="bg-white/90 backdrop-blur-md border-pack-border shadow-lg lg:sticky lg:top-24">
+      <CardHeader className="pb-3 sm:pb-4">
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+            <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center shrink-0 ${config.color.split(' ')[0]} shadow-sm`}>
+              <IconComponent className={`w-5 h-5 sm:w-6 sm:h-6 ${config.iconColor}`} />
             </div>
-            <div>
-              <CardTitle className="text-lg text-pack-foreground">{pack.name}</CardTitle>
-              <div className="flex items-center gap-2 mt-1">
-                <Badge variant="secondary" className={config.color}>
+            <div className="min-w-0 flex-1">
+              <CardTitle className="text-base sm:text-lg text-pack-foreground truncate">{pack.name}</CardTitle>
+              <div className="flex items-center gap-1.5 sm:gap-2 mt-1 flex-wrap">
+                <Badge variant="secondary" className={`${config.color} text-xs`}>
                   <IconComponent className="w-3 h-3 mr-1" />
                   {config.label}
                 </Badge>
@@ -272,11 +272,11 @@ const todayBirthdays = [
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 shrink-0">
             {pack.isOwner && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm">
+                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                     <MoreVertical className="w-4 h-4" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -285,31 +285,31 @@ const todayBirthdays = [
                     <Share2 className="w-4 h-4 mr-2" />
                     Compartir
                   </DropdownMenuItem>
-<DropdownMenuItem onClick={() => setIsEditOpen(true)}>
-  <Settings className="w-4 h-4 mr-2" />
-  Configurar
-</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setIsEditOpen(true)}>
+                    <Settings className="w-4 h-4 mr-2" />
+                    Configurar
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
-            <Button variant="ghost" size="sm" onClick={onClose}>
+            <Button variant="ghost" size="sm" onClick={onClose} className="h-8 w-8 p-0">
               <X className="w-4 h-4" />
             </Button>
           </div>
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-3 sm:space-y-4">
         {/* Description */}
         {pack.description && (
-          <p className="text-sm text-pack-muted-foreground">
+          <p className="text-xs sm:text-sm text-pack-muted-foreground leading-relaxed">
             {pack.description}
           </p>
         )}
 
         {/* Allowed Breeds */}
         {pack.allowedBreeds && pack.allowedBreeds.length > 0 && (
-          <div className="p-3 bg-pack-muted/30 rounded-lg">
+          <div className="p-2.5 sm:p-3 bg-pack-muted/30 rounded-xl">
             <p className="text-xs font-medium text-pack-foreground mb-2">Razas permitidas:</p>
             <div className="flex flex-wrap gap-1">
               {pack.allowedBreeds.map((breed) => (
