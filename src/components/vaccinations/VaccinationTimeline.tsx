@@ -1,21 +1,24 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle2, Clock, AlertCircle } from 'lucide-react';
+import { CheckCircle2, Clock, AlertCircle, Syringe, Bug } from 'lucide-react';
 
 interface VaccinationTimelineProps {
   appliedVaccines: Array<{
     id: number;
     name: string;
+    type: 'vaccine' | 'deworming';
     date: string;
     veterinarian: string;
     clinic: string;
-    lot: string;
+    lot?: string;
+    product?: string;
     nextDose: string | null;
   }>;
   upcomingVaccines: Array<{
     id: number;
     name: string;
+    type: 'vaccine' | 'deworming';
     dueDate: string;
     recommendedAge: string;
     importance: string;
@@ -80,7 +83,14 @@ export const VaccinationTimeline: React.FC<VaccinationTimelineProps> = ({
                 }`}>
                   <div className="flex items-start justify-between gap-3 mb-2">
                     <div className="flex-1">
-                      <h4 className="font-semibold text-foreground mb-1">{event.name}</h4>
+                      <div className="flex items-center gap-2 mb-2">
+                        {(event as any).type === 'vaccine' ? (
+                          <Syringe className="w-4 h-4 text-green-600" />
+                        ) : (
+                          <Bug className="w-4 h-4 text-blue-600" />
+                        )}
+                        <h4 className="font-semibold text-foreground">{event.name}</h4>
+                      </div>
                       {event.type === 'applied' ? (
                         <div className="space-y-1">
                           <p className="text-sm text-muted-foreground">
@@ -92,9 +102,16 @@ export const VaccinationTimeline: React.FC<VaccinationTimelineProps> = ({
                           <p className="text-sm text-muted-foreground">
                             <span className="font-medium">Clínica:</span> {(event as any).clinic}
                           </p>
-                          <p className="text-xs text-muted-foreground mt-1">
-                            Lote: {(event as any).lot}
-                          </p>
+                          {(event as any).lot && (
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Lote: {(event as any).lot}
+                            </p>
+                          )}
+                          {(event as any).product && (
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Producto: {(event as any).product}
+                            </p>
+                          )}
                           {(event as any).nextDose && (
                             <Badge variant="outline" className="mt-2 text-xs">
                               Próximo refuerzo: {new Date((event as any).nextDose).toLocaleDateString('es-ES')}

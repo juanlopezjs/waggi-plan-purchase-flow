@@ -2,12 +2,13 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Calendar, Bell, AlertCircle } from 'lucide-react';
+import { Calendar, Bell, AlertCircle, Syringe, Bug } from 'lucide-react';
 
 interface VaccinationCalendarProps {
   upcomingVaccines: Array<{
     id: number;
     name: string;
+    type: 'vaccine' | 'deworming';
     dueDate: string;
     recommendedAge: string;
     importance: string;
@@ -38,7 +39,14 @@ export const VaccinationCalendar: React.FC<VaccinationCalendarProps> = ({ upcomi
               <div key={vaccine.id} className="p-4 rounded-lg bg-white border border-red-200">
                 <div className="flex items-start justify-between gap-3 mb-2">
                   <div className="flex-1">
-                    <h4 className="font-semibold text-foreground mb-1">{vaccine.name}</h4>
+                    <div className="flex items-center gap-2 mb-1">
+                      {vaccine.type === 'vaccine' ? (
+                        <Syringe className="w-4 h-4 text-green-600" />
+                      ) : (
+                        <Bug className="w-4 h-4 text-blue-600" />
+                      )}
+                      <h4 className="font-semibold text-foreground">{vaccine.name}</h4>
+                    </div>
                     <p className="text-sm text-muted-foreground mb-2">{vaccine.description}</p>
                     <div className="flex items-center gap-4 text-xs text-muted-foreground">
                       <span>📅 {new Date(vaccine.dueDate).toLocaleDateString('es-ES')}</span>
@@ -71,7 +79,14 @@ export const VaccinationCalendar: React.FC<VaccinationCalendarProps> = ({ upcomi
               <div key={vaccine.id} className="p-4 rounded-lg bg-white border border-amber-200">
                 <div className="flex items-start justify-between gap-3 mb-2">
                   <div className="flex-1">
-                    <h4 className="font-semibold text-foreground mb-1">{vaccine.name}</h4>
+                    <div className="flex items-center gap-2 mb-1">
+                      {vaccine.type === 'vaccine' ? (
+                        <Syringe className="w-4 h-4 text-green-600" />
+                      ) : (
+                        <Bug className="w-4 h-4 text-blue-600" />
+                      )}
+                      <h4 className="font-semibold text-foreground">{vaccine.name}</h4>
+                    </div>
                     <p className="text-sm text-muted-foreground mb-2">{vaccine.description}</p>
                     <div className="flex items-center gap-4 text-xs text-muted-foreground">
                       <span>📅 {new Date(vaccine.dueDate).toLocaleDateString('es-ES')}</span>
@@ -106,7 +121,14 @@ export const VaccinationCalendar: React.FC<VaccinationCalendarProps> = ({ upcomi
               <div key={vaccine.id} className="p-4 rounded-lg border border-border">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1">
-                    <h4 className="font-semibold text-foreground mb-1">{vaccine.name}</h4>
+                    <div className="flex items-center gap-2 mb-1">
+                      {vaccine.type === 'vaccine' ? (
+                        <Syringe className="w-4 h-4 text-green-600" />
+                      ) : (
+                        <Bug className="w-4 h-4 text-blue-600" />
+                      )}
+                      <h4 className="font-semibold text-foreground">{vaccine.name}</h4>
+                    </div>
                     <p className="text-sm text-muted-foreground mb-2">{vaccine.description}</p>
                     <div className="flex items-center gap-4 text-xs text-muted-foreground">
                       <span>📅 {new Date(vaccine.dueDate).toLocaleDateString('es-ES')}</span>

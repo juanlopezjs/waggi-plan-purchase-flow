@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { QrCode, Download, Share2 } from 'lucide-react';
+import { QrCode, Download, Share2, Syringe, Bug } from 'lucide-react';
 
 interface VaccinationCardProps {
   pet: {
@@ -14,10 +14,12 @@ interface VaccinationCardProps {
   };
   appliedVaccines: Array<{
     name: string;
+    type: 'vaccine' | 'deworming';
     date: string;
     veterinarian: string;
     clinic: string;
-    lot: string;
+    lot?: string;
+    product?: string;
   }>;
 }
 
@@ -29,7 +31,7 @@ export const VaccinationCard: React.FC<VaccinationCardProps> = ({ pet, appliedVa
         <div className="bg-gradient-to-r from-vaccination-primary to-vaccination-secondary p-6 text-white">
           <div className="flex items-start justify-between mb-4">
             <div>
-              <h2 className="text-2xl font-bold mb-1">Carnet de Vacunación</h2>
+              <h2 className="text-2xl font-bold mb-1">Carnet de Salud</h2>
               <p className="text-sm opacity-90">Certificado Digital Waggi</p>
             </div>
             <div className="w-16 h-16 bg-white rounded-lg flex items-center justify-center">
@@ -52,15 +54,15 @@ export const VaccinationCard: React.FC<VaccinationCardProps> = ({ pet, appliedVa
         <CardContent className="p-6">
           <div className="space-y-4">
             <div className="flex items-center justify-between mb-4">
-              <h4 className="font-semibold text-sm text-muted-foreground">VACUNAS APLICADAS</h4>
+              <h4 className="font-semibold text-sm text-muted-foreground">TRATAMIENTOS APLICADOS</h4>
               <Badge variant="secondary" className="bg-green-500/10 text-green-700 border-green-200">
-                {appliedVaccines.length} Registradas
+                {appliedVaccines.length} Registrados
               </Badge>
             </div>
 
             {appliedVaccines.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground text-sm">
-                No hay vacunas registradas aún
+                No hay tratamientos registrados aún
               </div>
             ) : (
               <div className="space-y-3">
@@ -71,11 +73,27 @@ export const VaccinationCard: React.FC<VaccinationCardProps> = ({ pet, appliedVa
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          {vaccine.type === 'vaccine' ? (
+                            <div className="w-6 h-6 rounded-full bg-green-500/10 flex items-center justify-center">
+                              <Syringe className="w-3.5 h-3.5 text-green-600" />
+                            </div>
+                          ) : (
+                            <div className="w-6 h-6 rounded-full bg-blue-500/10 flex items-center justify-center">
+                              <Bug className="w-3.5 h-3.5 text-blue-600" />
+                            </div>
+                          )}
                           <h5 className="font-semibold text-foreground">{vaccine.name}</h5>
-                          <Badge variant="outline" className="text-xs">
-                            Lote: {vaccine.lot}
-                          </Badge>
+                          {vaccine.lot && (
+                            <Badge variant="outline" className="text-xs">
+                              Lote: {vaccine.lot}
+                            </Badge>
+                          )}
+                          {vaccine.product && (
+                            <Badge variant="outline" className="text-xs">
+                              {vaccine.product}
+                            </Badge>
+                          )}
                         </div>
                         <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-muted-foreground">
                           <div>
@@ -89,8 +107,12 @@ export const VaccinationCard: React.FC<VaccinationCardProps> = ({ pet, appliedVa
                           </div>
                         </div>
                       </div>
-                      <div className="w-8 h-8 rounded-full bg-green-500/10 flex items-center justify-center flex-shrink-0">
-                        <span className="text-green-600 text-lg">✓</span>
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                        vaccine.type === 'vaccine' ? 'bg-green-500/10' : 'bg-blue-500/10'
+                      }`}>
+                        <span className={`text-lg ${
+                          vaccine.type === 'vaccine' ? 'text-green-600' : 'text-blue-600'
+                        }`}>✓</span>
                       </div>
                     </div>
                   </div>
