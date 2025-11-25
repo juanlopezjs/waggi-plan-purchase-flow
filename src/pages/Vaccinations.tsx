@@ -8,10 +8,11 @@ import { VaccinationCard } from '@/components/vaccinations/VaccinationCard';
 import { VaccinationTimeline } from '@/components/vaccinations/VaccinationTimeline';
 import { AddVaccineDialog } from '@/components/vaccinations/AddVaccineDialog';
 import { VaccinationCalendar } from '@/components/vaccinations/VaccinationCalendar';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 const Vaccinations = () => {
   const navigate = useNavigate();
+  const { petId } = useParams();
   const [selectedPet, setSelectedPet] = useState<any>(null);
   const [isAddVaccineOpen, setIsAddVaccineOpen] = useState(false);
 
@@ -237,6 +238,16 @@ const Vaccinations = () => {
   };
 
   const selectedPetPlan = selectedPet ? vaccinationPlans[selectedPet.id as keyof typeof vaccinationPlans] : null;
+
+  // Pre-select pet if petId is in URL
+  React.useEffect(() => {
+    if (petId && !selectedPet) {
+      const pet = pets.find(p => p.id === parseInt(petId));
+      if (pet) {
+        setSelectedPet(pet);
+      }
+    }
+  }, [petId]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-vaccination-accent to-background">

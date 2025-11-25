@@ -6,7 +6,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Calendar, Scale, Ruler, Edit, Heart, Play, CheckCircle2, BookOpen } from 'lucide-react';
+import { Calendar, Scale, Ruler, Edit, Heart, Play, CheckCircle2, BookOpen, Syringe } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 // Mock data for courses - in production this would come from an API
 const mockCourses = [
@@ -72,6 +73,7 @@ interface PetDetailsProps {
 }
 
 export const PetDetails: React.FC<PetDetailsProps> = ({ pet }) => {
+  const navigate = useNavigate();
   const availableCourses = mockCourses.filter(c => c.status === 'available');
   const completedCourses = mockCourses.filter(c => c.status === 'completed');
   
@@ -138,6 +140,15 @@ export const PetDetails: React.FC<PetDetailsProps> = ({ pet }) => {
                 <p className="font-semibold">{new Date(pet.lastCheckup).toLocaleDateString('es-ES')}</p>
               </div>
             </div>
+
+            {/* Vaccination Record Button */}
+            <Button 
+              onClick={() => navigate(`/pets/vaccinations/${pet.id}`)}
+              className="w-full bg-vaccination-primary hover:bg-vaccination-primary/90 text-vaccination-primary-foreground"
+            >
+              <Syringe className="w-4 h-4 mr-2" />
+              Ver Carnet de Salud
+            </Button>
           </TabsContent>
 
           <TabsContent value="personality" className="space-y-4">
